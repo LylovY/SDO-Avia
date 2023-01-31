@@ -13,3 +13,19 @@ class CreatedModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class CreatedTaskModel(CreatedModel):
+    title = models.CharField(
+        'Заголовок',
+        max_length=100,
+        help_text='Название'
+    )
+    description = models.CharField(
+        'Описание',
+        max_length=250,
+        help_text='Описание'
+    )
+
+    class Meta:
+        abstract = True

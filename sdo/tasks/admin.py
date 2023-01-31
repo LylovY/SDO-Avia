@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from tasks.models import Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
+
+admin.site.register(TaskCase)
+admin.site.register(Task)
+admin.site.register(UserTaskCaseRelation)
+admin.site.register(UserTaskRelation)
