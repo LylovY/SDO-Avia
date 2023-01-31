@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+	<a class="btn btn-outline-danger " href="#">
+      Добавить вопрос
+  </a>
+	{% for task in task_list %}
+	<div class="shadow p-5 pt-0 m-5 mt-3 bg-body rounded">
+	    <div class="h2 pt-4 row">
+		   {{ task.title }}
+	    </div>
+			<div class='py-5 pb-0' align="justify">
+        <p>{{ task.description }}</p>
+			</div>
+			<div class="h3 pt-4 row">
+		   Решение:
+	    </div>
+			<div class='py-5 pb-0' align="justify">
+        <p>{{ task.answer }}</p>
+			</div>
+		{% include 'tasks/includes/reduction_group.html' %}
+	</div>
+
+	{% endfor %}
+</div>
+{% endblock %}

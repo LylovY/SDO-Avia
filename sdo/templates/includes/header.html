@@ -18,6 +18,18 @@
               <a class="nav-link {% if view_name == 'posts:create' %}active{% endif %}"
                 href="{% url 'admin:index' %}">Admin</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'posts:create' %}active{% endif %}"
+                href="{% url 'tasks:users_list' %}">Сотрудники</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'posts:create' %}active{% endif %}"
+                href="{% url 'tasks:task_list_admin' %}">Вопросы</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if view_name == 'posts:create' %}active{% endif %}"
+                href="{% url 'tasks:taskcase_list_admin' %}">Блоки тестов</a>
+            </li>
           {% endif %}
         <li class="nav-item">
           <a class="nav-link link-light {% if view_name == 'users:logout' %}active{% endif %}"

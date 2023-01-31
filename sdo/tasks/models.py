@@ -12,6 +12,9 @@ class TaskCase(CreatedTaskModel):
         null=True
     )
 
+    def __str__(self) -> str:
+        return self.title
+
 
 class Task(CreatedTaskModel):
     author = models.ForeignKey(
@@ -29,6 +32,9 @@ class Task(CreatedTaskModel):
         related_name='tasks',
         blank=True
     )
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class UserTaskCaseRelation(CreatedModel):
@@ -64,8 +70,8 @@ class UserTaskRelation(CreatedModel):
         related_name='task_relation',
         on_delete=models.CASCADE
     )
-    task_case = models.ForeignKey(
-        TaskCase,
+    task = models.ForeignKey(
+        Task,
         related_name='task_relation',
         on_delete=models.CASCADE
     )
@@ -74,4 +80,20 @@ class UserTaskRelation(CreatedModel):
         max_length=10,
         choices=TASK_STATUS,
         default=NEW,
+    )
+
+
+class Answer(CreatedModel):
+    author = models.ForeignKey(
+        User,
+        related_name='answers',
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(
+        'Ответ'
+    )
+    task = models.ForeignKey(
+        Task,
+        related_name='answers',
+        on_delete=models.CASCADE
     )

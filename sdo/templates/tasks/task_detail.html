@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+	<article class="shadow p-5 pt-0 m-5 mt-3 bg-body rounded">
+	    <div class="h2 pt-4 row">
+		   {{ task.title }}
+	    </div>
+			<div class='py-5 pb-0' align="justify">
+        <p>{{ task.description }}</p>
+			</div>
+	</article>
+	<h5 class="card-header">Добавить решение:</h5>
+    <div class="card-body">
+      <form method="post" action="{% url 'tasks:add_answer' taskcase task.id %}">
+        {% csrf_token %}
+        <div class="form-group mb-2">
+          {{ form.text|addclass:"form-control" }}
+        </div>
+        <button type="submit" class="btn btn-outline-secondary">Отправить</button>
+      </form>
+
+{% endblock %}
