@@ -1,12 +1,15 @@
 from django import forms
 
-from tasks.models import Answer
+from tasks.models import TaskCase, UserTaskRelation
+from users.models import User
 
 
 class AnswerForm(forms.ModelForm):
     class Meta:
-        model = Answer
-        fields = ('text',)
+        model = UserTaskRelation
+        fields = ('answer',)
         widgets = {
             'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
         }
+
+

@@ -40,6 +40,24 @@ class User(AbstractUser):
         blank=True,
         max_length=500
     )
+    task_case = models.ManyToManyField(
+        'tasks.TaskCase',
+        through='tasks.UserTaskCaseRelation',
+        verbose_name='Группа вопросов',
+        help_text='Папка вопросов',
+        related_name='users',
+        blank=True,
+        null=True,
+    )
+    tasks = models.ManyToManyField(
+        'tasks.Task',
+        through='tasks.UserTaskRelation',
+        verbose_name='Вопросы',
+        help_text='Вопросы',
+        related_name='users',
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         verbose_name = 'Пользователи'
@@ -49,7 +67,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-    def get_absolute_url(self):
-        return reverse("posts:profile", kwargs={"username": self.username})
+    # def get_absolute_url(self):
+    #     return reverse("posts:profile", kwargs={"username": self.username})
 
-# Create your models here.

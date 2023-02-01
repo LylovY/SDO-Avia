@@ -21,7 +21,7 @@ class CreatedTaskModel(CreatedModel):
         max_length=100,
         help_text='Название'
     )
-    description = models.CharField(
+    description = models.TextField(
         'Описание',
         max_length=250,
         help_text='Описание'

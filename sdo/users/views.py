@@ -1,8 +1,11 @@
+from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
 
+from users.forms import TaskCaseForm
 from users.models import User
 
 
@@ -14,19 +17,24 @@ class CreateUser(CreateView, SuccessMessageMixin):
     success_message = 'Аккаунт добавлен'
 
 
-class UpdateUser(UpdateView, SuccessMessageMixin):
+class UpdateUser(UpdateView):
     model = User
     fields = ('username', 'first_name', 'password')
     template_name = 'users/create_user.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
     success_url = reverse_lazy('tasks:users_list')
-    success_message = 'Аккаунт изменен'
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_edit'] = True
         return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "Аккаунт изменен")
+        super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     # def get_object(self):
     #     return User.objects.get(username=self.kwargs.get("username"))
@@ -40,3 +48,13 @@ class DeleteUser(DeleteView, SuccessMessageMixin):
     template_name = 'users/confirm_delete_user.html'
     context_object_name = 'user'
     success_message = 'Аккаунт удален'
+
+
+class TaskCaseUser(UpdateView):
+    model = User
+    form_class = TaskCaseForm
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+    context_object_name = 'user'
+    template_name = 'users/add_taskcase_user.html'
+    success_url = reverse_lazy('tasks:users_list')

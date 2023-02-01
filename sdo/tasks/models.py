@@ -30,8 +30,14 @@ class Task(CreatedTaskModel):
     task_case = models.ManyToManyField(
         TaskCase,
         related_name='tasks',
+        verbose_name='Группа вопросов',
         blank=True
     )
+
+    class Meta:
+        ordering = ('-created',)
+        verbose_name = 'Вопросы'
+        verbose_name_plural = 'Вопросы'
 
     def __str__(self) -> str:
         return self.title
@@ -75,6 +81,10 @@ class UserTaskRelation(CreatedModel):
         related_name='task_relation',
         on_delete=models.CASCADE
     )
+    answer = models.TextField(
+        'Ответ',
+        blank=True,
+    )
 
     status = models.CharField(
         max_length=10,
@@ -83,17 +93,20 @@ class UserTaskRelation(CreatedModel):
     )
 
 
-class Answer(CreatedModel):
-    author = models.ForeignKey(
-        User,
-        related_name='answers',
-        on_delete=models.CASCADE,
-    )
-    text = models.TextField(
-        'Ответ'
-    )
-    task = models.ForeignKey(
-        Task,
-        related_name='answers',
-        on_delete=models.CASCADE
-    )
+# class Answer(CreatedModel):
+#     author = models.ForeignKey(
+#         User,
+#         related_name='answers',
+#         on_delete=models.CASCADE,
+#     )
+#     text = models.TextField(
+#         'Ответ'
+#     )
+#     task = models.ForeignKey(
+#         Task,
+#         related_name='answers',
+#         on_delete=models.CASCADE
+#     )
+#     approoved = models.BooleanField(default=False)
+
+
