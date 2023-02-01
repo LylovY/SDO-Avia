@@ -16,7 +16,7 @@
       <form method="post" action="{% url 'tasks:add_answer' taskcase task.id %}">
         {% csrf_token %}
         <div class="form-group mb-2">
-          {{ form.text|addclass:"form-control" }}
+          {{ form.answer|addclass:"form-control" }}
         </div>
         <button type="submit" class="btn btn-outline-secondary">Отправить</button>
       </form>
