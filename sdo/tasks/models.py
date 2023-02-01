@@ -81,10 +81,10 @@ class UserTaskRelation(CreatedModel):
         related_name='task_relation',
         on_delete=models.CASCADE
     )
-    answer = models.TextField(
-        'Ответ',
-        blank=True,
-    )
+    # answers = models.TextField(
+    #     'Ответ',
+    #     blank=True,
+    # )
 
     status = models.CharField(
         max_length=10,
@@ -93,20 +93,24 @@ class UserTaskRelation(CreatedModel):
     )
 
 
-# class Answer(CreatedModel):
-#     author = models.ForeignKey(
-#         User,
-#         related_name='answers',
-#         on_delete=models.CASCADE,
-#     )
-#     text = models.TextField(
-#         'Ответ'
-#     )
-#     task = models.ForeignKey(
-#         Task,
-#         related_name='answers',
-#         on_delete=models.CASCADE
-#     )
-#     approoved = models.BooleanField(default=False)
+class Answer(CreatedModel):
+    relation = models.ForeignKey(
+        UserTaskRelation,
+        related_name='answers',
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(
+        'Ответ'
+    )
 
+
+class Review(CreatedModel):
+    relation = models.ForeignKey(
+        UserTaskRelation,
+        related_name='reviews',
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(
+        'Правки'
+    )
 

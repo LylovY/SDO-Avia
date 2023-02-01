@@ -92,8 +92,16 @@ class TaskDetail(DetailView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        taskcase = self.kwargs['pk']
+        task = self.kwargs['id']
+        user = self.request.user
+        relation, _ = UserTaskRelation.objects.get_or_create(
+            user=user,
+            task_id=task,
+        )
         context['form'] = AnswerForm
-        context['taskcase'] = self.kwargs['pk']
+        context['taskcase'] = taskcase
+        context['relation'] = relation
         return context
 
 
@@ -133,7 +141,6 @@ class DeleteTask(DeleteView):
     context_object_name = 'task'
 
 
-
 @login_required
 def add_answer(request, pk, id):
     task = get_object_or_404(Task, id=id)
@@ -141,15 +148,14 @@ def add_answer(request, pk, id):
     user = request.user
     if form.is_valid():
         answer = form.save(commit=False)
-        answer.author = user
-        answer.task = task
+        relation, created = UserTaskRelation.objects.get_or_create(
+            user=user,
+            task=task,
+        )
+        relation.status = UserTaskRelation.ON_CHECK
+        relation.save()
+        answer.relation = relation
         answer.save()
-    relation, created = UserTaskRelation.objects.get_or_create(
-        user=user,
-        task=task,
-    )
-    relation.status = UserTaskRelation.ON_CHECK
-    relation.save()
     return redirect('tasks:task_list', pk)
 
 
