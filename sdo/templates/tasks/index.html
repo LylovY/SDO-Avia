@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="container py-5">
+<div class="container p-0">
   <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for case in task_case %}
     <a href="{% url 'tasks:task_list' case.pk %}" class="text-reset text-decoration-none">
     <div class="col">
-      <div class="card">
+      <div class="card shadow cardcustom">
         <div class="card-body">
           <h5 class="card-title">{{ case.title }}</h5>
           <p class="card-text">{{ case.description }}</p>
