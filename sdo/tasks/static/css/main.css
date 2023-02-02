@@ -2,3 +2,28 @@ html, body{
     height: 100%;
     width: auto;
 }
+.cardcustom {
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+}
+
+.cardcustom:hover {
+	 -webkit-transform: scale(1.1);
+	 -moz-transform: scale(1.1);
+	 -o-transform: scale(1.1);
+ transform: scale(1.1);
+	 -webkit-transition: all 0.3s ease;
+	 -moz-transition: all 0.3s ease;
+	 transition: all 0.3s ease;
+}
+.nlink {
+    color: DimGray;
+    font-size: 110%;
+    text-decoration: none;
+}
+
+.nlink:hover {
+    color: BlueViolet;
+    background-color: Lavender;
+}
