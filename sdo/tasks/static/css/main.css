@@ -1,14 +1,14 @@
-html, body{
+html, main {
     height: 100%;
     width: auto;
 }
-.cardcustom {
+.cardcustom{
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
 	transition: all 0.3s ease;
 }
 
-.cardcustom:hover {
+.cardcustom:hover{
 	 -webkit-transform: scale(1.1);
 	 -moz-transform: scale(1.1);
 	 -o-transform: scale(1.1);
@@ -17,13 +17,13 @@ html, body{
 	 -moz-transition: all 0.3s ease;
 	 transition: all 0.3s ease;
 }
-.nlink {
+.nlink{
     color: DimGray;
     font-size: 110%;
     text-decoration: none;
 }
 
-.nlink:hover {
+.nlink:hover{
     color: BlueViolet;
     background-color: Lavender;
 }

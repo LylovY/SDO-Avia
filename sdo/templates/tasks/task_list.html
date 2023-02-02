@@ -10,9 +10,16 @@
 			<div class='py-5 pb-0' align="justify">
         <p>{{ task.description }}</p>
 			</div>
+
+		{% if task.status != 'CHECK' %}
 			<a class="btn btn-outline-danger " href="{% url 'tasks:task_detail' taskcase task.id  %}">
       Добавить ответ
       </a>
+		{% else %}
+		<div class="h4 pt-4 row">
+			Статус: {{ task.status }}
+		</div>
+		{% endif %}
 	</article>
 	{% endfor %}
 </div>

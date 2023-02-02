@@ -24,6 +24,21 @@
         <li>{{ task }}</li>
 				{% endfor %}
 			</ul>
+		<div class="h3 pt-4 row">
+		   Назначен сотрудникам:
+	    </div>
+
+			<ul class='py-5 pb-0'>
+				{% for user in task_case.users.all %}
+        <li>{{ user }}</li>
+				{% endfor %}
+			</ul>
+		<a class="btn btn-outline-danger " href="{% url 'tasks:add_task_taskcase' task_case.id %}">
+      Добавить вопросы
+    </a>
+		<a class="btn btn-outline-danger " href="{% url 'tasks:add_user_taskcase' task_case.id %}">
+      Назначить пользователям
+    </a>
 		<div class="d-flex justify-content-end">
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_taskcase' task_case.id %}">
 		    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">

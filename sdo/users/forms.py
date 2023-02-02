@@ -18,7 +18,7 @@ class TaskCaseForm(forms.ModelForm):
         fields = ['task_case']
 
 
-class TaskForm(forms.ModelForm):
+class TaskFormUser(forms.ModelForm):
     tasks = forms.ModelMultipleChoiceField(
         queryset=Task.objects.all(),
         label='Вопросы',
