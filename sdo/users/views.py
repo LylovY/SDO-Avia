@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
 
-from users.forms import TaskCaseForm
+from users.forms import TaskCaseForm, TaskForm
 from users.models import User
 
 
@@ -57,4 +57,23 @@ class TaskCaseUser(UpdateView):
     slug_url_kwarg = 'username'
     context_object_name = 'user'
     template_name = 'users/add_taskcase_user.html'
+    success_url = reverse_lazy('tasks:users_list')
+
+    def form_valid(self, form):
+        # self.object.groups.clear()
+        taskcases = [taskcase for taskcase in form.cleaned_data['task_case']]
+        for taskcase in taskcases:
+            for task in taskcase.tasks.all():
+                self.object.tasks.add(task)
+        # self.object.tasks.add(form.cleaned_data['task_case'])
+        return super(TaskCaseUser, self).form_valid(form)
+
+
+class TaskUser(UpdateView):
+    model = User
+    form_class = TaskForm
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+    context_object_name = 'user'
+    template_name = 'users/add_task_user.html'
     success_url = reverse_lazy('tasks:users_list')

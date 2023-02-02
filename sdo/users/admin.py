@@ -1,9 +1,19 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
+from tasks.models import UserTaskCaseRelation, UserTaskRelation
 from users.models import User
 
 # admin.site.register(User)
+
+class UserTaskCaseRelationInline(admin.TabularInline):
+    model = UserTaskCaseRelation
+    extra = 1
+
+
+class UserTaskRelationInline(admin.TabularInline):
+    model = UserTaskRelation
+    extra = 1
 
 
 @admin.register(User)
@@ -15,6 +25,7 @@ class UserAdmin(UserAdmin):
         'last_name',
         'email',
     )
+    inlines = (UserTaskCaseRelationInline, UserTaskRelationInline)
     fieldsets = (
         (None, {"fields": ('username', "email", "password")}),
         (("Личные данные"), {"fields": ("first_name", "last_name")}),

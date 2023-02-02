@@ -1,5 +1,7 @@
 from django import template
 
+from tasks.models import UserTaskRelation
+
 register = template.Library()
 
 
@@ -17,3 +19,9 @@ def addclass_checkbox(field, css):
 def user_track_directories(directories, user):
     user_track_directories = directories.filter(owner=user)
     return user_track_directories
+
+
+@register.simple_tag
+def user_task_count(qs):
+    tasks = qs.filter(task_relation__status=UserTaskRelation.NEW)
+    return tasks.count()

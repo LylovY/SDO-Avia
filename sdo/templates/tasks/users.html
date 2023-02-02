@@ -10,17 +10,24 @@
 	    <div class="h2 pt-4 row">
 		   {{ user.username }}({{ user.first_name }})
 	    </div>
+		{% load user_filters %}
+		{% user_task_count user.tasks.all as count %}
+
+		{% if user.tasks.count > 0 %}
 			<ul class='py-5 pb-0'>
         <li>Блоки: {% for taskcase in user.task_case.all %} {{taskcase}} {% endfor %}</li>
-				<li>Вопросы: </li>
-				<li>Ожидает проверки: </li>
-				<li>Решено: </li>
+				<li>Вопросы: {{ user.NEW }} </li>
+				<li>Ожидает проверки: {{ user.ON_CHECK }} </li>
+				<li>Решено: {{ user.ACCEPT }}</li>
 			</ul>
+		{% else %}
+		Нет назначенных тестов
+		{% endif %}
 		<div class="d-flex justify-content-end">
 			<a class="btn btn-outline-danger " href="{% url 'tasks:add_taskcase_user' user.username %}">
         Назначить блок
       </a>
-			<a class="btn btn-outline-danger " href="#">
+			<a class="btn btn-outline-danger " href="{% url 'tasks:add_task_user' user.username %}">
         Назначить вопрос
       </a>
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_user' user.username %}">

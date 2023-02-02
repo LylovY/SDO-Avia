@@ -1,6 +1,6 @@
 from django import forms
 
-from tasks.models import TaskCase
+from tasks.models import Task, TaskCase
 from users.models import User
 
 
@@ -16,3 +16,17 @@ class TaskCaseForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['task_case']
+
+
+class TaskForm(forms.ModelForm):
+    tasks = forms.ModelMultipleChoiceField(
+        queryset=Task.objects.all(),
+        label='Вопросы',
+        help_text='Назначьте вопросы',
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = User
+        fields = ['tasks']

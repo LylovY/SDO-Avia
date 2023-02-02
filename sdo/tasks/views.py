@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Case, Count, IntegerField, OuterRef, Q, Subquery, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
@@ -8,6 +9,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 
 from tasks.forms import AnswerForm
 from tasks.models import Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
+from tasks.utils import SubqueryCount
 from users.models import User
 
 
@@ -164,13 +166,24 @@ class UsersList(ListView):
     template_name = 'tasks/users.html'
     context_object_name = 'users'
 
-    # def get_context_data(self, *, object_list=None, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     # context['form'] = AnswerForm
-    #     context['taskcases'] = TaskCase.objects.all()
-    #     context['tasks'] = Task.objects.all()
-    #     context['users'] = User.objects.all()
-    #     return context
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['NEW'] = 'NEW'
+        # context['users'] = User.objects.annotate(
+        #     NEW=Count('tasks'),
+        #     new2=Count('task_case')
+        # )
+        # context['NEW'] = User.objects.filter(task_relation__status=UserTaskRelation.NEW, username=OuterRef('username')).count()
+        # context['ON_CHECK'] = UserTaskRelation.objects.filter(status=UserTaskRelation.ON_CHECK).count()
+        # context['ACCEPT'] = UserTaskRelation.objects.filter(status=UserTaskRelation.ACCEPT).count()
+        return context
+
+    def get_queryset(self):
+        return User.objects.annotate(
+                NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
+                ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
+                ACCEPT=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT)),
+        ).prefetch_related('tasks')
 
 
 # @login_required
