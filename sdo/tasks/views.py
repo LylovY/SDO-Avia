@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from tasks.forms import AnswerForm, TaskFormTaskcase, TaskFormTaskcaseUser
-from tasks.models import Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
+from tasks.models import Answer, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
 from tasks.utils import SubqueryCount
 from users.models import User
 
@@ -92,6 +92,31 @@ class TaskListAdmin(ListView):
     model = Task
     template_name = 'tasks/task_list_admin.html'
     context_object_name = 'task_list'
+
+
+class TaskListAdminCheck(ListView):
+    paginate_by = 10
+    model = Task
+    template_name = 'tasks/task_list_check.html'
+    context_object_name = 'task_list'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.kwargs['username']
+        return context
+
+    def get_queryset(self):
+        # print(Answer.objects.filter(relation=UserTaskRelation.objects.get(
+        #         user__username=self.kwargs.get('username'),
+        #         task=OuterRef('id')
+        #     )).only('text'))
+        # relation = UserTaskRelation.objects.get(
+        #     user__username=self.kwargs.get('username'),
+        #     task=OuterRef('id')
+        # ).values('answers')
+        return Task.objects.filter(users__username=self.kwargs.get('username'),
+                                   task_relation__status=UserTaskRelation.ON_CHECK)
+
 
 
 class TaskDetail(DetailView):

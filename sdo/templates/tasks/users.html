@@ -24,11 +24,16 @@
 		Нет назначенных тестов
 		{% endif %}
 		<div class="d-flex justify-content-end">
+			{% if user.ON_CHECK > 0 %}
+			<a class="btn btn-outline-success " href="{% url 'tasks:check_task' user.username %}">
+        Проверить
+      </a>
+			{% endif %}
 			<a class="btn btn-outline-danger " href="{% url 'tasks:add_taskcase_user' user.username %}">
         Назначить блок
       </a>
 			<a class="btn btn-outline-danger " href="{% url 'tasks:add_task_user' user.username %}">
-        Назначить вопрос
+        Вопросы
       </a>
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_user' user.username %}">
 		    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">

@@ -1,4 +1,4 @@
-html, main {
+html, main{
     height: 100%;
     width: auto;
 }
@@ -24,6 +24,16 @@ html, main {
 }
 
 .nlink:hover{
+    color: BlueViolet;
+    background-color: Lavender;
+}
+.blink {
+    color: DodgerBlue;
+    font-size: 110%;
+    text-decoration: none;
+}
+
+.blink:hover {
     color: BlueViolet;
     background-color: Lavender;
 }
