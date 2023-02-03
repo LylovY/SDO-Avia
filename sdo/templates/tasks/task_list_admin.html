@@ -11,7 +11,7 @@
 		   {{ task.title }}
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.description }}</p>
+        <p>{{ task.description|linebreaks }}</p>
 			</div>
 			<div class="h4 pt-4 row">
 				Находится в блоке вопросов:
@@ -23,7 +23,7 @@
 		   Решение:
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.answer }}</p>
+        <p>{{ task.answer|linebreaks }}</p>
 			</div>
 		<div class="d-flex justify-content-end">
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_task' task.id %}">

@@ -8,7 +8,7 @@
 		   {{ task.title }}
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.description }}</p>
+        <p>{{ task.description|linebreaks }}</p>
 			</div>
 
 		{% if task.status != 'CHECK' %}
