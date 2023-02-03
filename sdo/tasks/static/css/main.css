@@ -3,6 +3,10 @@ html, main{
     width: auto;
 }
 
+.active1{
+    background-color: Lavender;
+}
+
 .cardcustom{
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
@@ -38,6 +42,15 @@ html, main{
 .blink:hover {
     color: BlueViolet;
     background-color: Lavender;
+}
+
+.greylink{
+    color: DimGray;
+    text-decoration: none;
+}
+
+.greylink:hover{
+    color: BlueViolet;
 }
 
 .addbutton {
