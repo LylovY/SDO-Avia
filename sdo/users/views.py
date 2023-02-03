@@ -63,8 +63,9 @@ class TaskCaseUser(UpdateView):
         # self.object.groups.clear()
         taskcases = [taskcase for taskcase in form.cleaned_data['task_case']]
         for taskcase in taskcases:
-            for task in taskcase.tasks.all():
-                self.object.tasks.add(task)
+            self.object.tasks.set(taskcase.tasks.all())
+            # for task in taskcase.tasks.all():
+            #     self.object.tasks.set(taskcase.tasks.all())
         # self.object.tasks.add(form.cleaned_data['task_case'])
         return super(TaskCaseUser, self).form_valid(form)
 
