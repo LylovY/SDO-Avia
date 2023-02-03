@@ -1,28 +1,33 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<div class="container py-5">
-	<a class="btn btn-outline-danger " href="{% url 'tasks:create_task' %}">
-      Добавить вопрос
-  </a>
+<div class="container p-0">
+	<div class="d-flex justify-content-end">
+		<a class="btn addbutton" href="{% url 'tasks:create_task' %}">
+			<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+			</svg>
+			Добавить вопрос
+		</a>
+	</div>
 	{% for task in task_list %}
-	<div class="shadow p-5 pt-0 m-5 mt-3 bg-body rounded">
-	    <div class="h2 pt-4 row">
+	<div class="shadow p-5 pt-0 mt-3 bg-body rounded">
+	    <div class="h5 pt-5 row">
 		   {{ task.title }}
 	    </div>
-			<div class='py-5 pb-0' align="justify">
+			<div align="justify">
         <p>{{ task.description|linebreaks }}</p>
 			</div>
-			<div class="h4 pt-4 row">
+			<div class="h5 pt-4 row">
 				Находится в блоке вопросов:
 			</div>
 			<div>
 				{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
 			</div>
-			<div class="h3 pt-4 row">
+			<div class="h5 pt-4 row">
 		   Решение :
 	    </div>
-			<div class='py-5 pb-0' align="justify">
+			<div align="justify">
         <p>{{ task.answer|linebreaks }}</p>
 			</div>
 
