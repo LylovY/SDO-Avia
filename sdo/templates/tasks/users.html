@@ -10,9 +10,6 @@
 	    <div class="h2 pt-4 row">
 		   {{ user.username }}({{ user.first_name }})
 	    </div>
-		{% load user_filters %}
-		{% user_task_count user.tasks.all as count %}
-
 		{% if user.tasks.count > 0 %}
 			<ul class='py-5 pb-0'>
         <li>Блоки: {% for taskcase in user.task_case.all %} {{taskcase}} {% endfor %}</li>
