@@ -11,7 +11,7 @@
 	{% for task in task_list %}
 
 	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
-		<div class="h3 pt-4 d-flex mb-2">
+		<div class="h5 pt-5 d-flex mb-2">
 			<div class="me-auto">{{ task.title }}
 			</div>
 			{% if task.status == 'NEW' %}
@@ -47,7 +47,7 @@
 				</div>
 			{% endif %}
 		</div>
-		<div class='py-5 pb-0' align="justify">
+		<div align="justify">
 			<p>{{ task.description|linebreaks }}</p>
 		</div>
 		{% if task.status != 'CHECK' %}
