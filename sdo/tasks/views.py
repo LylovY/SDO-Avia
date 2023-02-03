@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from tasks.forms import AnswerForm, TaskFormTaskcase, TaskFormTaskcaseUser
-from tasks.models import Answer, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
+from tasks.forms import AnswerForm, ReviewForm, TaskFormTaskcase, TaskFormTaskcaseUser
+from tasks.models import Answer, Review, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
 from tasks.utils import SubqueryCount
 from users.models import User
 
@@ -147,6 +147,7 @@ class CreateTask(CreateView):
     success_url = reverse_lazy('tasks:task_list_admin')
 
     def form_valid(self, form):
+        form.instance.author = self.request.user
         messages.success(self.request, "Вопрос добавлен")
         super().form_valid(form)
         return HttpResponseRedirect(self.get_success_url())
@@ -192,6 +193,43 @@ def add_answer(request, pk, id):
         answer.relation = relation
         answer.save()
     return redirect('tasks:task_list', pk)
+
+
+@login_required
+def accept_answer(request, username, pk):
+    relation = get_object_or_404(UserTaskRelation, id=pk)
+    relation.status = UserTaskRelation.ACCEPT
+    relation.save()
+    return redirect('tasks:check_task', username)
+
+
+class AnswerDetail(DetailView):
+    model = Answer
+    template_name = 'tasks/answer_detail.html'
+    context_object_name = 'answer'
+    pk_url_kwarg = 'id'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ReviewForm
+        context['relation'] = self.kwargs['pk']
+        context['username'] = self.kwargs['username']
+        return context
+
+
+@login_required
+def add_review(request, username, pk, id):
+    answer = get_object_or_404(Answer, id=id)
+    form = ReviewForm(request.POST or None)
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.answer = answer
+        review.save()
+
+        relation = get_object_or_404(UserTaskRelation, id=pk)
+        relation.status = UserTaskRelation.FOR_REVISION
+        relation.save()
+    return redirect('tasks:check_task', username)
 
 
 class UsersList(ListView):

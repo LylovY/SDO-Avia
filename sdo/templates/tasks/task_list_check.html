@@ -11,30 +11,43 @@
 		   {{ task.title }}
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.description }}</p>
+        <p>{{ task.description|linebreaks }}</p>
 			</div>
-			<div class="h4 pt-4 row">
-				Находится в блоке вопросов:
-			</div>
-			<div>
-				{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
-			</div>
+
 			<div class="h3 pt-4 row">
 		   Базовое решение:
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.answer }}</p>
+        <p>{{ task.answer|linebreaks }}</p>
 			</div>
 		<div class="h3 pt-4 row">
-		   Новое решение2:
+		   Новое решение:
 	    </div>
 		{% load user_filters %}
 		{% user_task_relation task user as relation %}
 		{% for answer in relation.answers.all %}
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ answer.text }}</p>
+        <p>{{ answer.text|linebreaks }}</p>
 				<hr>
 			</div>
+		{% if answer.reviews.count > 0 %}
+			{% for review in answer.reviews.all %}
+				<div class='py-5 pb-0' align="justify">
+					<p>Замечание:</p>
+					<p>{{ review.text|linebreaks }}</p>
+					<hr>
+				</div>
+			{% endfor %}
+		{% endif %}
+
+			{% if forloop.last %}
+			<a class="btn btn-outline-success " href="{% url 'tasks:accept_answer' user.username relation.id %}">
+        Принять
+      </a>
+			<a class="btn btn-outline-success " href="{% url 'tasks:answer_detail' user.username relation.id answer.id %}">
+        На доработку
+      </a>
+			{% endif %}
 		{% endfor %}
 		<div class="d-flex justify-content-end">
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_task' task.id %}">

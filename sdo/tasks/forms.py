@@ -1,6 +1,6 @@
 from django import forms
 
-from tasks.models import Answer, Task, TaskCase, UserTaskRelation
+from tasks.models import Answer, Review, Task, TaskCase, UserTaskRelation
 from users.models import User
 
 
@@ -15,6 +15,15 @@ from users.models import User
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
+        fields = ('text',)
+        widgets = {
+            'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
+        }
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
         fields = ('text',)
         widgets = {
             'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
