@@ -105,12 +105,15 @@ class Answer(CreatedModel):
 
 
 class Review(CreatedModel):
-    relation = models.ForeignKey(
-        UserTaskRelation,
+    answer = models.ForeignKey(
+        Answer,
         related_name='reviews',
         on_delete=models.CASCADE,
     )
     text = models.TextField(
         'Правки'
     )
+
+    def __str__(self) -> str:
+        return self.text
 

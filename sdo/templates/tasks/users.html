@@ -7,8 +7,8 @@
   </a>
 	{% for user in users %}
 	<div class="shadow p-5 pt-0 mt-3 bg-body rounded">
-	    <div class="h2 pt-4 row">
-		   {{ user.username }}({{ user.first_name }})
+	    <div class="h2 pt-4 row"><a class="text-decoration-none text-reset" href="{% url 'tasks:check_task' user.username %}">
+		   {{ user.username }}({{ user.first_name }})</a>
 	    </div>
 		{% if user.tasks.count > 0 %}
 			<ul class='py-5 pb-0'>
