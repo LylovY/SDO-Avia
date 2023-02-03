@@ -11,7 +11,7 @@
 		</svg>
 		Назад</a>
 	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
-		<div class="h3 pt-4 d-flex mb-2">
+		<div class="h5 pt-5 d-flex mb-2">
 			<div class="me-auto">{{ task.title }}
 			</div>
 			<div class="h5" style="color: Olive;">
@@ -22,8 +22,8 @@
 				{{ relation.get_status_display }}
 			</div>
 		</div>
-		<div class='py-5 pb-0' align="justify">
-			<p>{{ task.description }}</p>
+		<div align="justify">
+			<p>{{ task.description|linebreaks }}</p>
 		</div>
 		{% if relation.status != 'CHECK' %}
 			<h style="color:DimGray">Решение</h>
@@ -33,12 +33,12 @@
 					<div class="form-group mb-2">
 						{{ form.text|addclass:"form-control" }}
 					</div>
-					<a class="btn btn-outline-primary " type="submit"
-						 href="javascript:history.back()">
+					<button class="btn sendbutton" type="submit">
 						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
 							<path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
 						</svg>
-						Отправить</a>
+						Отправить
+					</button>
 				</form>
 			</div>
 		{% endif %}
