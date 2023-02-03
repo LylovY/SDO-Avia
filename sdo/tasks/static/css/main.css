@@ -27,3 +27,13 @@ html, main{
     color: BlueViolet;
     background-color: Lavender;
 }
+.blink {
+    color: DodgerBlue;
+    font-size: 110%;
+    text-decoration: none;
+}
+
+.blink:hover {
+    color: BlueViolet;
+    background-color: Lavender;
+}
