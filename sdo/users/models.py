@@ -3,7 +3,6 @@ from django.db import models
 from django.urls import reverse
 
 
-
 class User(AbstractUser):
     username = models.CharField(
         unique=True,

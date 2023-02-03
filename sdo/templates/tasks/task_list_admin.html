@@ -20,11 +20,12 @@
 				{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
 			</div>
 			<div class="h3 pt-4 row">
-		   Решение:
+		   Решение :
 	    </div>
 			<div class='py-5 pb-0' align="justify">
         <p>{{ task.answer }}</p>
 			</div>
+
 		<div class="d-flex justify-content-end">
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_task' task.id %}">
 		    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
