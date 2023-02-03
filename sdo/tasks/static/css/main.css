@@ -2,6 +2,7 @@ html, main {
     height: 100%;
     width: auto;
 }
+
 .cardcustom{
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
@@ -27,6 +28,7 @@ html, main {
     color: BlueViolet;
     background-color: Lavender;
 }
+
 .blink {
     color: DodgerBlue;
     font-size: 110%;
@@ -36,4 +38,34 @@ html, main {
 .blink:hover {
     color: BlueViolet;
     background-color: Lavender;
+}
+
+.addbutton {
+    color: Green;
+    background-color: WhiteSmoke;
+    text-decoration: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.addbutton:hover {
+    color: White;
+    background-color: Green;
+}
+
+.sendbutton {
+    color: MediumBlue;
+    background-color: WhiteSmoke;
+    text-decoration: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.sendbutton:hover {
+    color: White;
+    background-color: MediumBlue;
 }
