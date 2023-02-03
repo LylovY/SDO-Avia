@@ -1,4 +1,5 @@
 from django import template
+from django.shortcuts import get_object_or_404
 
 from tasks.models import UserTaskRelation
 
@@ -22,6 +23,6 @@ def user_track_directories(directories, user):
 
 
 @register.simple_tag
-def user_task_count(qs):
-    tasks = qs.filter(task_relation__status=UserTaskRelation.NEW)
-    return tasks.count()
+def user_task_relation(task, user):
+    relation = get_object_or_404(UserTaskRelation, user__username=user, task=task)
+    return relation

@@ -9,6 +9,7 @@
 		</svg>
 		Назад</a>
 	{% for task in task_list %}
+
 	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		<div class="h3 pt-4 d-flex mb-2">
 			<div class="me-auto">{{ task.title }}
@@ -47,7 +48,7 @@
 			{% endif %}
 		</div>
 		<div class='py-5 pb-0' align="justify">
-			<p>{{ task.description }}</p>
+			<p>{{ task.description|linebreaks }}</p>
 		</div>
 		{% if task.status != 'CHECK' %}
 			<a class="btn addbutton" href="{% url 'tasks:task_detail' taskcase task.id  %}">

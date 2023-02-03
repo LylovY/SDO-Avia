@@ -11,7 +11,7 @@
 		   {{ task.title }}
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.description|linebreaks }}</p>
+        <p>{{ task.description }}</p>
 			</div>
 			<div class="h4 pt-4 row">
 				Находится в блоке вопросов:
@@ -20,12 +20,22 @@
 				{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
 			</div>
 			<div class="h3 pt-4 row">
-		   Решение :
+		   Базовое решение:
 	    </div>
 			<div class='py-5 pb-0' align="justify">
-        <p>{{ task.answer|linebreaks }}</p>
+        <p>{{ task.answer }}</p>
 			</div>
-
+		<div class="h3 pt-4 row">
+		   Новое решение2:
+	    </div>
+		{% load user_filters %}
+		{% user_task_relation task user as relation %}
+		{% for answer in relation.answers.all %}
+			<div class='py-5 pb-0' align="justify">
+        <p>{{ answer.text }}</p>
+				<hr>
+			</div>
+		{% endfor %}
 		<div class="d-flex justify-content-end">
 			<a class="text-decoration-none info ms-2" href="{% url 'tasks:update_task' task.id %}">
 		    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
