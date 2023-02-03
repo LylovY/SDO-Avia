@@ -23,7 +23,7 @@ class CreatedTaskModel(CreatedModel):
     )
     description = models.TextField(
         'Описание',
-        max_length=250,
+        max_length=2000,
         help_text='Описание'
     )
 
