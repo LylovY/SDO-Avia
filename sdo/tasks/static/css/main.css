@@ -45,12 +45,15 @@ html, main{
 }
 
 .greylink{
-    color: DimGray;
+    color: BlueViolet;
     text-decoration: none;
+    border-radius: 50%;
+    background-color: WhiteSmoke;
 }
 
 .greylink:hover{
-    color: BlueViolet;
+    color: White;
+    background-color: BlueViolet;
 }
 
 .addbutton {
