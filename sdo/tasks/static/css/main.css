@@ -3,10 +3,6 @@ html, main{
     width: auto;
 }
 
-.active1{
-    background-color: Lavender;
-}
-
 .cardcustom{
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
@@ -49,6 +45,8 @@ html, main{
     text-decoration: none;
     border-radius: 50%;
     background-color: WhiteSmoke;
+    width: 42px;
+    height: 42px;
 }
 
 .greylink:hover{
@@ -84,4 +82,9 @@ html, main{
 .sendbutton:hover {
     color: White;
     background-color: MediumBlue;
+}
+
+.active1 {
+    color: White;
+    background-color: BlueViolet;
 }
