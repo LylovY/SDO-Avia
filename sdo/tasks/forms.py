@@ -1,16 +1,24 @@
 from django import forms
+from django.forms import MultipleChoiceField, models
 
 from tasks.models import Answer, Review, Task, TaskCase, UserTaskRelation
 from users.models import User
 
 
-# class AnswerForm(forms.ModelForm):
-#     class Meta:
-#         model = UserTaskRelation
-#         fields = ('answer',)
-#         widgets = {
-#             'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
-#         }
+class CustomModelChoiceIterator(models.ModelChoiceIterator):
+    def choice(self, obj):
+        return (self.field.prepare_value(obj),
+                self.field.label_from_instance(obj), obj)
+
+
+class CustomModelChoiceField(models.ModelMultipleChoiceField):
+    def _get_choices(self):
+        if hasattr(self, '_choices'):
+            return self._choices
+        return CustomModelChoiceIterator(self)
+    choices = property(_get_choices,
+                       MultipleChoiceField._set_choices)
+
 
 class AnswerForm(forms.ModelForm):
     class Meta:
@@ -31,7 +39,7 @@ class ReviewForm(forms.ModelForm):
 
 
 class TaskFormTaskcase(forms.ModelForm):
-    tasks = forms.ModelMultipleChoiceField(
+    tasks = CustomModelChoiceField(
         queryset=Task.objects.all(),
         label='Вопросы',
         help_text='Назначьте вопросы',
