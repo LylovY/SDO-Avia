@@ -18,6 +18,7 @@ html, main{
 	 -moz-transition: all 0.3s ease;
 	 transition: all 0.3s ease;
 }
+
 .nlink{
     color: DimGray;
     font-size: 110%;
@@ -38,6 +39,15 @@ html, main{
 .blink:hover {
     color: BlueViolet;
     background-color: Lavender;
+}
+
+.tlink{
+    color: DimGray;
+    text-decoration: none;
+}
+
+.tlink:hover{
+    color: BlueViolet;
 }
 
 .greylink{
