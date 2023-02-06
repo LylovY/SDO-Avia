@@ -37,7 +37,11 @@
 		</div>
 		<ul>
 			{% for task in task_case.tasks.all %}
-			<li>{{ task }}</li>
+			<li>
+				<a class="nlink rounded" href="{% url 'tasks:update_task' task.id %}">
+					{{ task }}
+			  </a>
+			</li>
 			{% endfor %}
 		</ul>
 		<div class="h5 pt-4 row">
