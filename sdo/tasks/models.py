@@ -15,6 +15,11 @@ class TaskCase(CreatedTaskModel):
     def __str__(self) -> str:
         return self.title
 
+    class Meta:
+        ordering = ('-created',)
+        verbose_name = 'Блоки'
+        verbose_name_plural = 'Блоки'
+
 
 class Task(CreatedTaskModel):
     author = models.ForeignKey(

@@ -4,7 +4,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Case, Count, IntegerField, OuterRef, Q, Subquery, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from tasks.forms import AnswerForm, ReviewForm, TaskFormTaskcase, TaskFormTaskcaseUser
@@ -62,7 +62,7 @@ class UpdateTaskCase(UpdateView):
 
 class DeleteTaskCase(DeleteView):
     model = TaskCase
-    success_url = reverse_lazy('tasks:task_list_admin')
+    success_url = reverse_lazy('tasks:taskcase_list_admin')
     template_name = 'tasks/confirm_delete_taskcase.html'
     context_object_name = 'taskcase'
 
@@ -157,10 +157,11 @@ class UpdateTask(UpdateView):
     model = Task
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
-    success_url = reverse_lazy('tasks:task_list_admin')
+    # success_url = HttpResponseRedirect(self.request.path_info)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['current_page'] = self.request.GET.get('page', 1)
         context['is_edit'] = True
         return context
 
@@ -168,6 +169,17 @@ class UpdateTask(UpdateView):
         messages.success(self.request, "Вопрос изменен")
         super().form_valid(form)
         return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        res = reverse('tasks:task_list_admin')
+        if 'page' in self.request.GET:
+            res += f"?page={self.request.GET['page']}"
+        return res
+
+    # def get_success_url(self):
+    #     return self.request.path
+
+
 
 
 class DeleteTask(DeleteView):
