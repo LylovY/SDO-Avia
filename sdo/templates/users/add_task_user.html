@@ -11,14 +11,12 @@
     </svg>
     Назад
   </a>
-	<div class="card-body ps-0 pt-1">
-		<form method="post" action="{% url 'tasks:add_task_user' user.username %}">
-			{% csrf_token %}
-			{{ form.tasks|addclass:' p-0 m-0 list-unstyled ' }}
-			<button class="btn customlink p-0 m-0 mt-1 text-decoration-underline fw-bold" style="font-size: 100%;" type="submit">
-				Применить
-			</button>
-		</form>
-	</div>
+	<form method="post" action="{% url 'tasks:add_task_user' user.username %}" class="shadow p-5 pt-0 mt-3 bg-body rounded">
+		{% csrf_token %}
+		{{ form.tasks|addclass:' p-0 m-0 list-unstyled ' }}
+		<button class="btn sendbutton mt-4" style="font-size: 100%;" type="submit">
+			Применить
+		</button>
+	</form>
 </div>
 {% endblock %}

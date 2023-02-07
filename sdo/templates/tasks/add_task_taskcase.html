@@ -11,24 +11,18 @@
     </svg>
     Назад
   </a>
-  <div class="row justify-content-center">
-    <div class="col-md-8 p-5">
-      <div class="card">
-        <div class="card-header">
-          Добавить вопросы к тестy "{{taskcase.title}}"
-        </div>
-				<div class="card-body">
-					<form method="post" action="{% url 'tasks:add_task_taskcase' taskcase.id %}">
-					  {% csrf_token %}
-
-						{{ form.tasks|addclass:' p-0 m-0 list-unstyled ' }}
-
-						<button class="btn customlink p-0 m-0 mt-1 text-decoration-underline fw-bold" style="font-size: 100%;" type="submit">
-					    Применить
-						</button>
-					</form>
-				</div>
-      </div>
+  <div class="shadow p-5 pt-0 mt-3 bg-body rounded">
+    <div class="h5 pt-5">
+      Добавить вопросы к тестy "{{taskcase.title}}"
+    </div>
+    <div class="card-body">
+      <form method="post" action="{% url 'tasks:add_task_taskcase' taskcase.id %}">
+        {% csrf_token %}
+        {{ form.tasks|addclass:' p-0 m-0 list-unstyled ' }}
+        <button class="btn sendbutton mt-4" style="font-size: 100%;" type="submit">
+          Применить
+        </button>
+      </form>
     </div>
   </div>
 </div>
