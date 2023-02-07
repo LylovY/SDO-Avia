@@ -322,7 +322,7 @@ class AddTaskCaseUsers(UpdateView):
         users = [user for user in form.cleaned_data['users']]
         for user in users:
             for task in self.object.tasks.all():
-                relation, _ = UserTaskRelation.objects.get_or_create(
+                relation = UserTaskRelation.objects.create(
                     user=user,
                     task=task
                 )
@@ -334,6 +334,15 @@ class AddTaskCaseUsers(UpdateView):
             #     self.object.tasks.set(taskcase.tasks.all())
         # self.object.tasks.add(form.cleaned_data['task_case'])
         return super(AddTaskCaseUsers, self).form_valid(form)
+
+
+def complete_taskcase(request, pk):
+    taskcase = get_object_or_404(TaskCase, id=pk)
+    user = request.user
+    for task in taskcase.tasks.all():
+        user.tasks.remove(task)
+    user.task_case.remove(taskcase)
+    return redirect('tasks:taskcase_list')
 
 # @login_required
 # def add_taskcase(request, pk):
