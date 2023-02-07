@@ -1,23 +1,22 @@
 from django import forms
 from django.forms import MultipleChoiceField, models
+from django.utils.html import format_html
+from django import urls
 
 from tasks.models import Answer, Review, Task, TaskCase, UserTaskRelation
 from users.models import User
 
 
-class CustomModelChoiceIterator(models.ModelChoiceIterator):
-    def choice(self, obj):
-        return (self.field.prepare_value(obj),
-                self.field.label_from_instance(obj), obj)
-
-
+# class CustomModelChoiceIterator(models.ModelChoiceIterator):
+#     def choice(self, obj):
+#         return (self.field.prepare_value(obj),
+#                 self.field.label_from_instance(obj), obj)
+#
+#
 class CustomModelChoiceField(models.ModelMultipleChoiceField):
-    def _get_choices(self):
-        if hasattr(self, '_choices'):
-            return self._choices
-        return CustomModelChoiceIterator(self)
-    choices = property(_get_choices,
-                       MultipleChoiceField._set_choices)
+    def label_from_instance(self, obj):
+        link = urls.reverse('tasks:task_detail_admin', args=[obj.id])
+        return format_html('<a href="{}">{}</a>', link, obj.title)
 
 
 class AnswerForm(forms.ModelForm):

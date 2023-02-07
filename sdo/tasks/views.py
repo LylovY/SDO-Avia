@@ -94,6 +94,13 @@ class TaskListAdmin(ListView):
     context_object_name = 'task_list'
 
 
+class TaskDetailAdmin(DetailView):
+    model = Task
+    template_name = 'tasks/task_detail_admin.html'
+    context_object_name = 'task'
+    pk_url_kwarg = 'pk'
+
+
 class TaskListAdminCheck(ListView):
     paginate_by = 10
     model = Task

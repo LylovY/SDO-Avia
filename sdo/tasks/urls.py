@@ -5,7 +5,7 @@ from tasks.views import AddTaskCaseUsers, AddTaskTaskCase, AnswerDetail, CreateT
     TaskCaseList, \
     TaskCaseListAdmin, \
     TaskDetail, \
-    TaskListAdmin, \
+    TaskDetailAdmin, TaskListAdmin, \
     TaskListAdminCheck, TaskListUser, \
     UpdateTask, UpdateTaskCase, UsersList, \
     accept_answer, add_answer, add_review
@@ -29,6 +29,7 @@ urlpatterns = [
     path('users/<slug:username>/check/<int:pk>/<int:id>', AnswerDetail.as_view(), name='answer_detail'),
     path('users/<slug:username>/check/<int:pk>/<int:id>/add_review', add_review, name='add_review'),
     path('tasks/', TaskListAdmin.as_view(), name='task_list_admin'),
+    path('tasks/<int:pk>/', TaskDetailAdmin.as_view(), name='task_detail_admin'),
     path('tasks/create', CreateTask.as_view(), name='create_task'),
     path('tasks/<int:pk>/update', UpdateTask.as_view(), name='update_task'),
     path('tasks/<int:pk>/delete', DeleteTask.as_view(), name='delete_task'),
