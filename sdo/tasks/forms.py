@@ -16,7 +16,7 @@ from users.models import User
 class CustomModelChoiceField(models.ModelMultipleChoiceField):
     def label_from_instance(self, obj):
         link = urls.reverse('tasks:task_detail_admin', args=[obj.id])
-        return format_html('<a href="{}">{}</a>', link, obj.title)
+        return format_html('<a class="text-decoration-none text-reset" href="{}">{}</a>', link, obj.title)
 
 
 class AnswerForm(forms.ModelForm):
