@@ -94,6 +94,36 @@ html, main{
     background-color: MediumBlue;
 }
 
+.delbutton {
+    color: Crimson;
+    background-color: WhiteSmoke;
+    text-decoration: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.delbutton:hover {
+    color: White;
+    background-color: Crimson;
+}
+
+.clxbutton {
+    color: grey;
+    background-color: WhiteSmoke;
+    text-decoration: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.clxbutton:hover {
+    color: White;
+    background-color: grey;
+}
+
 .active1 {
     color: White;
     background-color: BlueViolet;

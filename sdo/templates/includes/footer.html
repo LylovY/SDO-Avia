@@ -1,4 +1,4 @@
 {% load tz %}
-<footer class="text-center py-3 footer {% if request.resolver_match.view_name == 'tasks:taskcase_list' %}fixed-bottom{% endif %}">
+<footer class="text-center py-3 footer {% if request.resolver_match.view_name in 'tasks:taskcase_list, tasks:create_user, tasks:delete_user, tasks:delete_taskcase, tasks:delete_task, tasks:add_user_taskcase, tasks:add_taskcase_user, tasks:update_user, users:logout, users:login' %}fixed-bottom{% endif %}">
      <p style="color:DimGray">© {{ year }} <span style="color:purple">СДО </span><span style="color:Indigo">авиа</span></p>
 </footer>

@@ -4,15 +4,15 @@
     <div class="container py-5">
         <div class="row justify-content-center">
           <div class="col-md-8 p-5">
-            <div class="card">
+            <div class="card shadow">
               <div class="card-header">
-                <h1>Удалить аккаунт</h1>
+                <h5>Удалить аккаунт</h5>
               </div>
               <div class="card-body">
                 <form action="" method="post">{% csrf_token %}
                   <p>Вы действительно хотите удалить аккаунт "{{ user.username }}"?</p>
-                    <button class="btn btn-outline-danger" type="submit">Удалить</button>
-                  <a class="btn btn-outline-secondary" href="{%url 'tasks:users_list' %}">Отмена</a>
+                    <button class="btn delbutton" type="submit">Удалить</button>
+                  <a class="btn clxbutton" href="{%url 'tasks:users_list' %}">Отмена</a>
                 </form>
               </div>
             </div>
