@@ -10,11 +10,25 @@
         <div class="card-body">
           <h5 class="card-title">{{ case.title }}</h5>
           <p class="card-text">{{ case.description }}</p>
+          <ul>
+            <li>Новые: {{ case.NEW }} </li>
+            <li>Отправлено на проверку: {{ case.ON_CHECK }} </li>
+            <li>Принято: {{ case.ACCEPT }}</li>
+          </ul>
         </div>
       </div>
     </div>
     </a>
     {% endfor %}
+    {% if user.task_case.count > 1 %}
+    Статистика всего:
+    <ul>
+      <li>Вопросы: {{ NEW }} </li>
+      <li>Отправлено на проверку: {{ ON_CHECK }} </li>
+      <li>Принято: {{ ACCEPT }}</li>
+    </ul>
+    {% endif %}
   </div>
+  {% include 'tasks/includes/paginator.html' %}
 </div>
 {% endblock %}

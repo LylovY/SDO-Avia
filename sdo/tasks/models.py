@@ -86,10 +86,6 @@ class UserTaskRelation(CreatedModel):
         related_name='task_relation',
         on_delete=models.CASCADE
     )
-    # answers = models.TextField(
-    #     'Ответ',
-    #     blank=True,
-    # )
 
     status = models.CharField(
         max_length=10,

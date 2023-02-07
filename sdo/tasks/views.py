@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Case, Count, IntegerField, OuterRef, Q, Subquery, When
+from django.db.models import Case, Count, F, Func, IntegerField, OuterRef, Q, Subquery, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -14,13 +14,41 @@ from users.models import User
 
 
 class TaskCaseList(ListView):
-    paginate_by = 10
+    paginate_by = 3
     model = TaskCase
     template_name = 'tasks/index.html'
     context_object_name = 'task_case'
 
     def get_queryset(self):
-        return TaskCase.objects.filter(task_case_relation__user=self.request.user)
+        task_count_new = Task.objects.filter(task_case=OuterRef('id'),
+                                         task_relation__user=self.request.user,
+                                         task_relation__status=UserTaskRelation.NEW).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        task_count_oncheck = Task.objects.filter(task_case=OuterRef('id'),
+                                             task_relation__user=self.request.user,
+                                             task_relation__status=UserTaskRelation.ON_CHECK).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        task_count_accept = Task.objects.filter(task_case=OuterRef('id'),
+                                             task_relation__user=self.request.user,
+                                             task_relation__status=UserTaskRelation.ACCEPT).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        return TaskCase.objects.filter(task_case_relation__user=self.request.user).annotate(
+            NEW=Subquery(task_count_new),
+            ON_CHECK=Subquery(task_count_oncheck),
+            ACCEPT=Subquery(task_count_accept),
+    )
+
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['NEW'] = user.tasks.filter(task_relation__status=UserTaskRelation.NEW).count()
+        context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count()
+        context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).count()
+        return context
 
 
 class TaskCaseListAdmin(ListView):
@@ -113,14 +141,6 @@ class TaskListAdminCheck(ListView):
         return context
 
     def get_queryset(self):
-        # print(Answer.objects.filter(relation=UserTaskRelation.objects.get(
-        #         user__username=self.kwargs.get('username'),
-        #         task=OuterRef('id')
-        #     )).only('text'))
-        # relation = UserTaskRelation.objects.get(
-        #     user__username=self.kwargs.get('username'),
-        #     task=OuterRef('id')
-        # ).values('answers')
         return Task.objects.filter(users__username=self.kwargs.get('username'),
                                    task_relation__status=UserTaskRelation.ON_CHECK)
 
@@ -211,7 +231,7 @@ def add_answer(request, pk, id):
         relation.save()
         answer.relation = relation
         answer.save()
-    return redirect('tasks:task_detail', pk, id)
+    return redirect('tasks:task_list', pk)
 
 
 @login_required
@@ -219,7 +239,10 @@ def accept_answer(request, username, pk):
     relation = get_object_or_404(UserTaskRelation, id=pk)
     relation.status = UserTaskRelation.ACCEPT
     relation.save()
-    return redirect('tasks:check_task', username)
+    user = get_object_or_404(User, username=username)
+    if user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count() > 0:
+        return redirect('tasks:check_task', username)
+    return redirect('tasks:users_list')
 
 
 class AnswerDetail(DetailView):
@@ -248,7 +271,10 @@ def add_review(request, username, pk, id):
         relation = get_object_or_404(UserTaskRelation, id=pk)
         relation.status = UserTaskRelation.FOR_REVISION
         relation.save()
-    return redirect('tasks:check_task', username)
+    user = get_object_or_404(User, username=username)
+    if user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count() > 0:
+        return redirect('tasks:check_task', username)
+    return redirect('tasks:users_list')
 
 
 class UsersList(ListView):

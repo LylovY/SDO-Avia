@@ -15,7 +15,6 @@
 		<div class="h5 pt-5 d-flex mb-2">
 			<div class="me-auto"><a class="text-decoration-none text-reset" href="{% url 'tasks:task_detail' taskcase task.id %}">{{ task.title }}</a>
 			</div>
-
 			{% if task.status == 'NEW' %}
 				<div class="h5" style="color: FireBrick;">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-shield-plus" viewBox="0 0 16 16">

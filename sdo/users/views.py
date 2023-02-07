@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
 
+from tasks.models import UserTaskRelation
 from users.forms import TaskCaseForm, TaskFormUser
 from users.models import User
 
@@ -60,10 +61,20 @@ class TaskCaseUser(UpdateView):
     success_url = reverse_lazy('tasks:users_list')
 
     def form_valid(self, form):
-        # self.object.groups.clear()
+        self.object.tasks.clear()
         taskcases = [taskcase for taskcase in form.cleaned_data['task_case']]
+
         for taskcase in taskcases:
-            self.object.tasks.set(taskcase.tasks.all())
+            for task in taskcase.tasks.all():
+                self.object.tasks.add(task)
+    #             relation = UserTaskRelation.objects.create(
+    #                 user=self.object,
+    #                 task=task
+    #             )
+    #             relation.status = UserTaskRelation.NEW
+    #             relation.save()
+            # taskcase.tasks.filter(task_relation__user=self.object).status = UserTaskRelation.NEW
+            # self.object.tasks.set(taskcase.tasks.all())
             # for task in taskcase.tasks.all():
             #     self.object.tasks.set(taskcase.tasks.all())
         # self.object.tasks.add(form.cleaned_data['task_case'])
