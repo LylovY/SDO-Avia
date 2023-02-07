@@ -20,9 +20,9 @@ class TaskCaseList(ListView):
     context_object_name = 'task_case'
 
     def get_queryset(self):
-        task_count_new = Task.objects.filter(task_case=OuterRef('id'),
-                                         task_relation__user=self.request.user,
-                                         task_relation__status=UserTaskRelation.NEW).annotate(
+        task_count_new = Task.objects.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
+                                         task_case=OuterRef('id'),
+                                         task_relation__user=self.request.user).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
         task_count_oncheck = Task.objects.filter(task_case=OuterRef('id'),
@@ -36,7 +36,7 @@ class TaskCaseList(ListView):
             count=Func(F('id'), function='Count')
         ).values('count')
         return TaskCase.objects.filter(task_case_relation__user=self.request.user).annotate(
-            NEW=Subquery(task_count_new),
+            WAITING_ANSWER=Subquery(task_count_new),
             ON_CHECK=Subquery(task_count_oncheck),
             ACCEPT=Subquery(task_count_accept),
     )
@@ -45,7 +45,7 @@ class TaskCaseList(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        context['NEW'] = user.tasks.filter(task_relation__status=UserTaskRelation.NEW).count()
+        context['WAITING_ANSWER'] = user.tasks.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION)).count()
         context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count()
         context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).count()
         return context
@@ -316,6 +316,24 @@ class AddTaskCaseUsers(UpdateView):
     context_object_name = 'taskcase'
     template_name = 'tasks/add_user_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
+
+    def form_valid(self, form):
+        # self.object.tasks.clear()
+        users = [user for user in form.cleaned_data['users']]
+        for user in users:
+            for task in self.object.tasks.all():
+                relation, _ = UserTaskRelation.objects.get_or_create(
+                    user=user,
+                    task=task
+                )
+                relation.status = UserTaskRelation.NEW
+                relation.save()
+            # taskcase.tasks.filter(task_relation__user=self.object).status = UserTaskRelation.NEW
+            # self.object.tasks.set(taskcase.tasks.all())
+            # for task in taskcase.tasks.all():
+            #     self.object.tasks.set(taskcase.tasks.all())
+        # self.object.tasks.add(form.cleaned_data['task_case'])
+        return super(AddTaskCaseUsers, self).form_valid(form)
 
 # @login_required
 # def add_taskcase(request, pk):
