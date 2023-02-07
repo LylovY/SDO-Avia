@@ -13,8 +13,9 @@
 
 	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		<div class="h5 pt-5 d-flex mb-2">
-			<div class="me-auto">{{ task.title }}
+			<div class="me-auto"><a class="text-decoration-none text-reset" href="{% url 'tasks:task_detail' taskcase task.id %}">{{ task.title }}</a>
 			</div>
+
 			{% if task.status == 'NEW' %}
 				<div class="h5" style="color: FireBrick;">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-shield-plus" viewBox="0 0 16 16">
@@ -51,7 +52,7 @@
 		<div align="justify">
 			<p>{{ task.description|linebreaks }}</p>
 		</div>
-		{% if task.status != 'CHECK' %}
+		{% if task.status not in 'CHECK, ACCEPT' %}
 			<a class="btn addbutton" href="{% url 'tasks:task_detail' taskcase task.id  %}">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
 					<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>

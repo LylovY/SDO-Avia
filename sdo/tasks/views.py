@@ -211,7 +211,7 @@ def add_answer(request, pk, id):
         relation.save()
         answer.relation = relation
         answer.save()
-    return redirect('tasks:task_list', pk)
+    return redirect('tasks:task_detail', pk, id)
 
 
 @login_required

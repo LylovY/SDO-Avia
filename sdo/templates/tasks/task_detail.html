@@ -25,7 +25,35 @@
 		<div align="justify">
 			<p>{{ task.description|linebreaks }}</p>
 		</div>
-		{% if relation.status != 'CHECK' %}
+		{% for answer in relation.answers.all %}
+			<div class="card col-10 d-flex justify-content-start mt-5" style="border-color: Gainsboro; border-radius: 15px;">
+				<div class="card-body">
+					<div class="card-title" style="color: grey;">
+						Ответ сотрудника {{ user.username }}({{ user.first_name }}):
+					</div>
+					<p class="card-text">
+						{{ answer.text|linebreaks }}
+					</p>
+				</div>
+			</div>
+		{% if answer.reviews.count > 0 %}
+			{% for review in answer.reviews.all %}
+				<div class="d-flex justify-content-end mt-5">
+					<div class="card col-10" style="border-color: MediumPurple; border-radius: 15px;">
+						<div class="card-body">
+							<div class="card-title" style="color: MediumPurple;">
+								Замечание:
+							</div>
+							<p class="card-text">
+								{{ review.text|linebreaks }}
+							</p>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+		{% endfor %}
+		{% if relation.status not in 'CHECK, ACCEPT' %}
 			<h style="color:DimGray">Решение</h>
 			<div class="card-body p-0">
 				<form method="post" action="{% url 'tasks:add_answer' taskcase task.id %}">
@@ -42,6 +70,8 @@
 				</form>
 			</div>
 		{% endif %}
+	</div>
+
 	</article>
 </div>
 {% endblock %}
