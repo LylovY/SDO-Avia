@@ -11,7 +11,7 @@
 	</a>
 	{% for task in task_list %}
 
-	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
+	<article class="shadow p-5 pt-0 mt-3 bg-body rounded cardcustomusers">
 		<div class="h5 pt-5 d-flex mb-2">
 			<div class="me-auto"><a class="text-decoration-none text-reset" href="{% url 'tasks:task_detail' taskcase task.id %}">{{ task.title }}</a>
 			</div>
