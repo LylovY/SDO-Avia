@@ -35,7 +35,7 @@
 		<div class="h5 pt-4 row">
 		 	Список вопросов:
 		</div>
-		<ul>
+		<ul class="list-group-numbered" style="color:DimGrey;">
 			{% for task in task_case.tasks.all %}
 			<li>
 				<a class="tlink" href="{% url 'tasks:task_detail_admin' task.id %}">
