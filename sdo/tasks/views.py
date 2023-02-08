@@ -308,7 +308,7 @@ class UsersList(ListView):
             NEW=NEW,
             ON_CHECK=ON_CHECK,
             ACCEPT=ACCEPT
-        )
+        ).order_by('-ON_CHECK')
         # ).annonate(
         #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
         #     ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
