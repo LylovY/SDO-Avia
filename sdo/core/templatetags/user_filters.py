@@ -17,9 +17,9 @@ def addclass_checkbox(field, css):
 
 
 @register.simple_tag
-def user_track_directories(directories, user):
-    user_track_directories = directories.filter(owner=user)
-    return user_track_directories
+def task_on_check_count(status):
+    task_on_check_count = UserTaskRelation.objects.filter(status=status).count()
+    return task_on_check_count
 
 
 @register.simple_tag
