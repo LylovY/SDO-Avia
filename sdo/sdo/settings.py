@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'tasks.apps.TasksConfig',
     'core.apps.CoreConfig',
+    'notes.apps.NotesConfig'
 ]
 
 MIDDLEWARE = [

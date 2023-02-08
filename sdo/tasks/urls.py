@@ -1,5 +1,6 @@
 from django.urls import include, path
 
+from notes.views import CreateNote, DeleteNote, NoteList, UpdateNote
 from tasks.views import AddTaskCaseUsers, AddTaskTaskCase, AnswerDetail, CreateTask, CreateTaskCase, DeleteTask, \
     DeleteTaskCase, \
     TaskCaseList, \
@@ -24,6 +25,10 @@ urlpatterns = [
     path('users/<slug:username>/delete', DeleteUser.as_view(), name='delete_user'),
     path('users/<slug:username>/add_taskcase', TaskCaseUser.as_view(), name='add_taskcase_user'),
     path('users/<slug:username>/add_task', AddTaskUser.as_view(), name='add_task_user'),
+    path('users/<slug:username>/notes', NoteList.as_view(), name='note_list'),
+    path('users/<slug:username>/notes/create_note', CreateNote.as_view(), name='create_note'),
+    path('users/<slug:username>/notes/<int:pk>/update_note', UpdateNote.as_view(), name='update_note'),
+    path('users/<slug:username>/notes/<int:pk>/delete_note', DeleteNote.as_view(), name='delete_note'),
     path('users/<slug:username>/check', TaskListAdminCheck.as_view(), name='check_task'),
     path('users/<slug:username>/check/<int:pk>/accept_answer', accept_answer, name='accept_answer'),
     path('users/<slug:username>/check/<int:pk>/<int:id>', AnswerDetail.as_view(), name='answer_detail'),
