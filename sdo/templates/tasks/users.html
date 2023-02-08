@@ -11,11 +11,14 @@
 		</a>
 	</div>
 	{% for user in users %}
-	<div class="shadow p-5 pt-0 mt-3 bg-body rounded">
+	<div class="shadow p-5 pt-0 mt-3 rounded cardcustomusers">
 		<div class="h4 pt-5 d-flex justify-content-between">
-			<div class="row">
+			<label>
 				{{ user.username }}({{ user.first_name }})
-			</div>
+				{% if user.ON_CHECK > 0 %}
+				<span class="required text-danger fw-bold">*</span>
+				{% endif %}
+			</label>
 			<div>
 				<a class="btn text-decoration-none greylink" href="{% url 'tasks:note_list' user.username %}">
 					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sticky" viewBox="0 0 16 16">
