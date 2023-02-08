@@ -21,7 +21,7 @@ class NoteList(ListView):
 
     def get_queryset(self):
         username = self.kwargs.get('username')
-        return Note.objects.filter(user=username)
+        return Note.objects.filter(user__username=username)
 
 
 class CreateNote(CreateView):
