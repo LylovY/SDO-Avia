@@ -194,13 +194,17 @@ class UpdateTask(UpdateView):
 
     def form_valid(self, form):
         messages.success(self.request, "Вопрос изменен")
-        super().form_valid(form)
-        return HttpResponseRedirect(self.get_success_url())
+        # super().form_valid(form)
+        # return HttpResponseRedirect(self.get_success_url())
+        return super().form_valid(form)
 
     def get_success_url(self):
-        res = reverse('tasks:task_list_admin')
-        if 'page' in self.request.GET:
-            res += f"?page={self.request.GET['page']}"
+        res = self.request.META.get('HTTP_REFERER')
+        # res = reverse('tasks:task_list_admin')
+        # print(self.request.GET)
+        # if 'page' in self.request.GET:
+        #     res += f"?page={self.request.GET['page']}"
+        #     # print(res)
         return res
 
     # def get_success_url(self):
