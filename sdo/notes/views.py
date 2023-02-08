@@ -18,7 +18,6 @@ class NoteList(ListView):
         context = super().get_context_data(**kwargs)
         username = self.kwargs.get('username')
         context['username'] = username
-        context['note_count'] = Note.objects.filter(user__username=username).count()
         return context
 
     def get_queryset(self):

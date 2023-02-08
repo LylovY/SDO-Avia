@@ -303,6 +303,7 @@ class UsersList(ListView):
             NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
             ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
             ACCEPT=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT)),
+            note_count=Count('notes'),
         ).prefetch_related('tasks')
 
 
