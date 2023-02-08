@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Case, Count, F, Func, IntegerField, OuterRef, Q, Subquery, When
+from django.db.models import Case, Count, Exists, F, Func, IntegerField, OuterRef, Q, Subquery, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -299,12 +299,21 @@ class UsersList(ListView):
         return context
 
     def get_queryset(self):
+        note_count = User.objects.annotate(count=Count('notes')).values('count').order_by('-date_joined').filter(pk=OuterRef('pk'))
+        NEW = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW))
+        ON_CHECK = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK))
+        ACCEPT = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT))
         return User.objects.annotate(
-            NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
-            ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
-            ACCEPT=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT)),
-            note_count=Count('notes'),
-        ).prefetch_related('tasks')
+            note_count=Subquery(note_count),
+            NEW=NEW,
+            ON_CHECK=ON_CHECK,
+            ACCEPT=ACCEPT
+        )
+        # ).annonate(
+        #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
+        #     ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
+        #     # ACCEPT=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT)),
+        # ).prefetch_related('tasks')
 
 
 class AddTaskTaskCase(UpdateView):
