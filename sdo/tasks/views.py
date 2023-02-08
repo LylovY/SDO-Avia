@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Case, Count, Exists, F, Func, IntegerField, OuterRef, Q, Subquery, When
 from django.http import HttpResponseRedirect
@@ -7,13 +8,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
+from core.views import MyLoginRequiredMixin
 from tasks.forms import AnswerForm, ReviewForm, TaskFormTaskcase, TaskFormTaskcaseUser
 from tasks.models import Answer, Review, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
 from tasks.utils import SubqueryCount
 from users.models import User
 
 
-class TaskCaseList(ListView):
+class TaskCaseList(MyLoginRequiredMixin, ListView):
     paginate_by = 3
     model = TaskCase
     template_name = 'tasks/index.html'
@@ -51,14 +53,14 @@ class TaskCaseList(ListView):
         return context
 
 
-class TaskCaseListAdmin(ListView):
+class TaskCaseListAdmin(MyLoginRequiredMixin, ListView):
     paginate_by = 5
     model = TaskCase
     template_name = 'tasks/taskcase_list_admin.html'
     context_object_name = 'task_cases'
 
 
-class CreateTaskCase(CreateView):
+class CreateTaskCase(MyLoginRequiredMixin, CreateView):
     model = TaskCase
     fields = ('title', 'description')
     template_name = 'tasks/create_taskcase.html'
@@ -70,7 +72,7 @@ class CreateTaskCase(CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class UpdateTaskCase(UpdateView):
+class UpdateTaskCase(MyLoginRequiredMixin, UpdateView):
     model = TaskCase
     fields = ('title', 'description')
     template_name = 'tasks/create_taskcase.html'
@@ -88,14 +90,19 @@ class UpdateTaskCase(UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class DeleteTaskCase(DeleteView):
+class DeleteTaskCase(MyLoginRequiredMixin, DeleteView):
     model = TaskCase
     success_url = reverse_lazy('tasks:taskcase_list_admin')
     template_name = 'tasks/confirm_delete_taskcase.html'
     context_object_name = 'taskcase'
+    success_message = "Группа вопросов удалена"
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(DeleteTaskCase, self).delete(request, *args, **kwargs)
 
 
-class TaskListUser(ListView):
+class TaskListUser(MyLoginRequiredMixin, ListView):
     paginate_by = 10
     model = Task
     template_name = 'tasks/task_list.html'
@@ -115,21 +122,21 @@ class TaskListUser(ListView):
         return context
 
 
-class TaskListAdmin(ListView):
+class TaskListAdmin(MyLoginRequiredMixin, ListView):
     paginate_by = 10
     model = Task
     template_name = 'tasks/task_list_admin.html'
     context_object_name = 'task_list'
 
 
-class TaskDetailAdmin(DetailView):
+class TaskDetailAdmin(MyLoginRequiredMixin, DetailView):
     model = Task
     template_name = 'tasks/task_detail_admin.html'
     context_object_name = 'task'
     pk_url_kwarg = 'pk'
 
 
-class TaskListAdminCheck(ListView):
+class TaskListAdminCheck(MyLoginRequiredMixin, ListView):
     paginate_by = 10
     model = Task
     template_name = 'tasks/task_list_check.html'
@@ -145,8 +152,7 @@ class TaskListAdminCheck(ListView):
                                    task_relation__status=UserTaskRelation.ON_CHECK)
 
 
-
-class TaskDetail(DetailView):
+class TaskDetail(MyLoginRequiredMixin, DetailView):
     model = Task
     template_name = 'tasks/task_detail.html'
     context_object_name = 'task'
@@ -167,7 +173,7 @@ class TaskDetail(DetailView):
         return context
 
 
-class CreateTask(CreateView):
+class CreateTask(MyLoginRequiredMixin, CreateView):
     model = Task
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
@@ -180,7 +186,7 @@ class CreateTask(CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class UpdateTask(UpdateView):
+class UpdateTask(MyLoginRequiredMixin, UpdateView):
     model = Task
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
@@ -211,13 +217,16 @@ class UpdateTask(UpdateView):
     #     return self.request.path
 
 
-
-
-class DeleteTask(DeleteView):
+class DeleteTask(MyLoginRequiredMixin, DeleteView):
     model = Task
     success_url = reverse_lazy('tasks:task_list_admin')
     template_name = 'tasks/confirm_delete_task.html'
     context_object_name = 'task'
+    success_message = "Вопрос удален"
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(DeleteTask, self).delete(request, *args, **kwargs)
 
 
 @login_required
@@ -249,7 +258,7 @@ def accept_answer(request, username, pk):
     return redirect('tasks:users_list')
 
 
-class AnswerDetail(DetailView):
+class AnswerDetail(MyLoginRequiredMixin, DetailView):
     model = Answer
     template_name = 'tasks/answer_detail.html'
     context_object_name = 'answer'
@@ -281,7 +290,7 @@ def add_review(request, username, pk, id):
     return redirect('tasks:users_list')
 
 
-class UsersList(ListView):
+class UsersList(MyLoginRequiredMixin, ListView):
     model = User
     template_name = 'tasks/users.html'
     context_object_name = 'users'
@@ -316,7 +325,7 @@ class UsersList(ListView):
         # ).prefetch_related('tasks')
 
 
-class AddTaskTaskCase(UpdateView):
+class AddTaskTaskCase(MyLoginRequiredMixin, UpdateView):
     model = TaskCase
     form_class = TaskFormTaskcase
     context_object_name = 'taskcase'
@@ -324,7 +333,7 @@ class AddTaskTaskCase(UpdateView):
     success_url = reverse_lazy('tasks:taskcase_list_admin')
 
 
-class AddTaskCaseUsers(UpdateView):
+class AddTaskCaseUsers(MyLoginRequiredMixin, UpdateView):
     model = TaskCase
     form_class = TaskFormTaskcaseUser
     context_object_name = 'taskcase'
@@ -350,6 +359,7 @@ class AddTaskCaseUsers(UpdateView):
         return super(AddTaskCaseUsers, self).form_valid(form)
 
 
+@login_required()
 def complete_taskcase(request, pk):
     taskcase = get_object_or_404(TaskCase, id=pk)
     user = request.user
