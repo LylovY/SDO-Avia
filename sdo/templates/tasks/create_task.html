@@ -22,7 +22,7 @@
         {% load user_filters %}
         <form enctype="multipart/form-data" method="post"
         action="{% if is_edit %}
-                  {% url 'tasks:update_task' task.id  %}
+                  {% url 'tasks:update_task' task.id %}
                 {% else %}
                   {% url 'tasks:create_task' %}
                 {% endif %}">

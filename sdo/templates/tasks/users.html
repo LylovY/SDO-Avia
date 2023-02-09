@@ -13,12 +13,19 @@
 	{% for user in users %}
 	<div class="shadow p-5 pt-0 mt-3 rounded cardcustomusers">
 		<div class="h4 pt-5 d-flex justify-content-between">
-			<label>
-				{{ user.username }}({{ user.first_name }})
-				{% if user.ON_CHECK > 0 %}
-				<span class="required text-danger fw-bold">*</span>
-				{% endif %}
-			</label>
+			<div>
+				<label data-bs-toggle="collapse" href="#collapse{{ user.username }}" role="button" aria-expanded="false" aria-controls="collapse{{ user.username }}">
+					{{ user.username }}({{ user.first_name }})
+					{% if user.ON_CHECK > 0 %}
+					<span class="required text-danger fw-bold">*</span>
+					{% endif %}
+				</label>
+				<div class="collapse ms-2 me-2" id="collapse{{ user.username }}" style="font-size:75%">
+					<div style="color:DimGrey; font-size:70%">
+						Пароль: {{ user.parol }}
+					</div>
+				</div>
+			</div>
 			<div>
 				<a class="btn text-decoration-none greylink" href="{% url 'tasks:note_list' user.username %}">
 					{% if user.note_count == 0 %}
