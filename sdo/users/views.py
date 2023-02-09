@@ -24,7 +24,7 @@ class CreateUser(CreateView, SuccessMessageMixin, AdminRequiredMixin, ):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class UpdateUser(UpdateView, AdminRequiredMixin, ):
+class UpdateUser(UpdateView, AdminRequiredMixin):
     """СИзменение юзера"""
     model = User
     # fields = ('username', 'first_name', 'password')

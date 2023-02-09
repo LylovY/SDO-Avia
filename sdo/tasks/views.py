@@ -312,7 +312,7 @@ def add_review(request, username, pk, id):
     return redirect('tasks:users_list')
 
 
-class UsersList(ListView, AdminRequiredMixin):
+class UsersList(AdminRequiredMixin, ListView):
     """GenericView листа юзеров"""
     model = User
     template_name = 'tasks/users.html'
@@ -333,7 +333,7 @@ class UsersList(ListView, AdminRequiredMixin):
             NEW=NEW,
             ON_CHECK=ON_CHECK,
             ACCEPT=ACCEPT
-        ).order_by('-ON_CHECK')
+            ).order_by('-ON_CHECK')
         # ).annonate(
         #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
         #     ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
