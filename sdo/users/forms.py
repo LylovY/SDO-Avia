@@ -38,4 +38,4 @@ class TaskFormUser(forms.ModelForm):
 class CreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('username', 'first_name')
+        fields = ('username', 'first_name', 'parol')
