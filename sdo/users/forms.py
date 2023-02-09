@@ -1,10 +1,12 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
 
 from tasks.models import Task, TaskCase
 from users.models import User
 
 
 class TaskCaseForm(forms.ModelForm):
+    """Форма добавления юзеру группы вопросов"""
     task_case = forms.ModelMultipleChoiceField(
         queryset=TaskCase.objects.all(),
         label='Группы вопросов',
@@ -19,6 +21,7 @@ class TaskCaseForm(forms.ModelForm):
 
 
 class TaskFormUser(forms.ModelForm):
+    """Форма добавления юзеру вопросов"""
     tasks = forms.ModelMultipleChoiceField(
         queryset=Task.objects.all(),
         label='Вопросы',
@@ -30,3 +33,9 @@ class TaskFormUser(forms.ModelForm):
     class Meta:
         model = User
         fields = ['tasks']
+
+
+class CreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('username', 'first_name')

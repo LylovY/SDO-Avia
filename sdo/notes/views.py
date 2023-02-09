@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from notes.models import Note
@@ -9,6 +9,7 @@ from users.models import User
 
 
 class NoteList(ListView):
+    """Список заметок пользователя"""
     paginate_by = 5
     model = Note
     template_name = 'notes/notes_list.html'
@@ -26,10 +27,10 @@ class NoteList(ListView):
 
 
 class CreateNote(CreateView):
+    """Создание заметки"""
     model = Note
     fields = ('text',)
     template_name = 'notes/create_note.html'
-    # success_url = reverse_lazy('tasks:note_list')
 
     def form_valid(self, form):
         user = get_object_or_404(User, username=self.kwargs.get('username'))
@@ -51,10 +52,10 @@ class CreateNote(CreateView):
 
 
 class UpdateNote(UpdateView):
+    """Изменение заметки"""
     model = Note
     fields = ('text',)
     template_name = 'notes/create_note.html'
-    # success_url = reverse_lazy('tasks:note_list')
     context_object_name = 'note'
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -75,8 +76,8 @@ class UpdateNote(UpdateView):
 
 
 class DeleteNote(DeleteView):
+    """Удаление заметки"""
     model = Note
-    # success_url = reverse_lazy('tasks:taskcase_list_admin')
     template_name = 'notes/confirm_delete_note.html'
     context_object_name = 'taskcase'
 

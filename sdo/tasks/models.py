@@ -5,6 +5,7 @@ from users.models import User
 
 
 class TaskCase(CreatedTaskModel):
+    """Модель группы вопросов """
     author = models.ForeignKey(
         User,
         related_name='taskcase_author',
@@ -22,6 +23,7 @@ class TaskCase(CreatedTaskModel):
 
 
 class Task(CreatedTaskModel):
+    """Модель вопросов"""
     author = models.ForeignKey(
         User,
         related_name='task_author',
@@ -49,6 +51,7 @@ class Task(CreatedTaskModel):
 
 
 class UserTaskCaseRelation(CreatedModel):
+    """Модель связи группы вопросов с пользователями"""
     user = models.ForeignKey(
         User,
         related_name='task_case_relation',
@@ -66,6 +69,7 @@ class UserTaskCaseRelation(CreatedModel):
 
 
 class UserTaskRelation(CreatedModel):
+    """Модель связи вопросов с пользователями"""
     NEW = 'NEW'
     ON_CHECK = 'CHECK'
     FOR_REVISION = 'REVISION'
@@ -95,6 +99,7 @@ class UserTaskRelation(CreatedModel):
 
 
 class Answer(CreatedModel):
+    """Модель ответов"""
     relation = models.ForeignKey(
         UserTaskRelation,
         related_name='answers',
@@ -106,6 +111,7 @@ class Answer(CreatedModel):
 
 
 class Review(CreatedModel):
+    "Модель замечаний к ответам"
     answer = models.ForeignKey(
         Answer,
         related_name='reviews',

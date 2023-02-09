@@ -1,31 +1,38 @@
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
 
-from tasks.models import UserTaskRelation
-from users.forms import TaskCaseForm, TaskFormUser
+from core.views import AdminRequiredMixin
+from users.forms import CreationForm, TaskCaseForm, TaskFormUser
 from users.models import User
 
 
-class CreateUser(CreateView, SuccessMessageMixin):
+class CreateUser(CreateView, SuccessMessageMixin, AdminRequiredMixin, ):
+    """Создание юзера"""
     model = User
-    fields = ('username', 'first_name', 'password')
+    # fields = ('username', 'first_name', 'password')
+    form_class = CreationForm
     template_name = 'users/create_user.html'
     success_url = reverse_lazy('tasks:users_list')
     success_message = 'Аккаунт добавлен'
 
+    def form_valid(self, form):
+        messages.success(self.request, "Пользователь создан")
+        super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
 
-class UpdateUser(UpdateView):
+
+class UpdateUser(UpdateView, AdminRequiredMixin, ):
+    """СИзменение юзера"""
     model = User
-    fields = ('username', 'first_name', 'password')
+    # fields = ('username', 'first_name', 'password')
+    form_class = CreationForm
     template_name = 'users/create_user.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
     success_url = reverse_lazy('tasks:users_list')
-
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -41,7 +48,8 @@ class UpdateUser(UpdateView):
     #     return User.objects.get(username=self.kwargs.get("username"))
 
 
-class DeleteUser(DeleteView, SuccessMessageMixin):
+class DeleteUser(DeleteView, SuccessMessageMixin, AdminRequiredMixin):
+    """Удаление юзера"""
     model = User
     slug_field = 'username'
     slug_url_kwarg = 'username'
@@ -50,8 +58,13 @@ class DeleteUser(DeleteView, SuccessMessageMixin):
     context_object_name = 'user'
     success_message = 'Аккаунт удален'
 
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(DeleteUser, self).delete(request, *args, **kwargs)
 
-class TaskCaseUser(UpdateView):
+
+class TaskCaseUser(UpdateView, AdminRequiredMixin, ):
+    """Назначение пользователю группы вопросов"""
     model = User
     form_class = TaskCaseForm
     slug_field = 'username'
@@ -67,21 +80,22 @@ class TaskCaseUser(UpdateView):
         for taskcase in taskcases:
             for task in taskcase.tasks.all():
                 self.object.tasks.add(task)
-    #             relation = UserTaskRelation.objects.create(
-    #                 user=self.object,
-    #                 task=task
-    #             )
-    #             relation.status = UserTaskRelation.NEW
-    #             relation.save()
-            # taskcase.tasks.filter(task_relation__user=self.object).status = UserTaskRelation.NEW
-            # self.object.tasks.set(taskcase.tasks.all())
-            # for task in taskcase.tasks.all():
-            #     self.object.tasks.set(taskcase.tasks.all())
+        #             relation = UserTaskRelation.objects.create(
+        #                 user=self.object,
+        #                 task=task
+        #             )
+        #             relation.status = UserTaskRelation.NEW
+        #             relation.save()
+        # taskcase.tasks.filter(task_relation__user=self.object).status = UserTaskRelation.NEW
+        # self.object.tasks.set(taskcase.tasks.all())
+        # for task in taskcase.tasks.all():
+        #     self.object.tasks.set(taskcase.tasks.all())
         # self.object.tasks.add(form.cleaned_data['task_case'])
         return super(TaskCaseUser, self).form_valid(form)
 
 
-class AddTaskUser(UpdateView):
+class AddTaskUser(UpdateView, AdminRequiredMixin, ):
+    """Назначение пользователю  вопросов"""
     model = User
     form_class = TaskFormUser
     slug_field = 'username'

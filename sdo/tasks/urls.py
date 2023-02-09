@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 
 from notes.views import CreateNote, DeleteNote, NoteList, UpdateNote
 from tasks.views import AddTaskCaseUsers, AddTaskTaskCase, AnswerDetail, CreateTask, CreateTaskCase, DeleteTask, \

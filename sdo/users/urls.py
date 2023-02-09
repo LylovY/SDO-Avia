@@ -1,7 +1,5 @@
 from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import include, path, reverse_lazy
-
-from tasks.views import TaskCaseList
+from django.urls import path, reverse_lazy
 
 app_name = 'users'
 urlpatterns = [

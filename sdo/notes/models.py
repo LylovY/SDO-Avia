@@ -5,6 +5,7 @@ from users.models import User
 
 
 class Note(CreatedModel):
+    """Модель заметок"""
     author = models.ForeignKey(
         User,
         related_name='note_author',

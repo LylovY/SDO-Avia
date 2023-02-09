@@ -1,66 +1,67 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
-from django.db.models import Case, Count, Exists, F, Func, IntegerField, OuterRef, Q, Subquery, When
-from django.http import HttpResponseRedirect
+from django.db.models import Count, F, Func, OuterRef, Q, Subquery
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from core.views import MyLoginRequiredMixin
+from core.views import AdminRequiredMixin, MyLoginRequiredMixin
 from tasks.forms import AnswerForm, ReviewForm, TaskFormTaskcase, TaskFormTaskcaseUser
-from tasks.models import Answer, Review, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
-from tasks.utils import SubqueryCount
+from tasks.models import Answer, Task, TaskCase, UserTaskRelation
 from users.models import User
 
 
 class TaskCaseList(MyLoginRequiredMixin, ListView):
+    """GenericView листа группы вопросов от юзера"""
     paginate_by = 3
     model = TaskCase
     template_name = 'tasks/index.html'
     context_object_name = 'task_case'
 
     def get_queryset(self):
-        task_count_new = Task.objects.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
-                                         task_case=OuterRef('id'),
-                                         task_relation__user=self.request.user).annotate(
+        task_count_new = Task.objects.filter(
+            Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
+            task_case=OuterRef('id'),
+            task_relation__user=self.request.user).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
         task_count_oncheck = Task.objects.filter(task_case=OuterRef('id'),
-                                             task_relation__user=self.request.user,
-                                             task_relation__status=UserTaskRelation.ON_CHECK).annotate(
+                                                 task_relation__user=self.request.user,
+                                                 task_relation__status=UserTaskRelation.ON_CHECK).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
         task_count_accept = Task.objects.filter(task_case=OuterRef('id'),
-                                             task_relation__user=self.request.user,
-                                             task_relation__status=UserTaskRelation.ACCEPT).annotate(
+                                                task_relation__user=self.request.user,
+                                                task_relation__status=UserTaskRelation.ACCEPT).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
         return TaskCase.objects.filter(task_case_relation__user=self.request.user).annotate(
             WAITING_ANSWER=Subquery(task_count_new),
             ON_CHECK=Subquery(task_count_oncheck),
             ACCEPT=Subquery(task_count_accept),
-    )
-
+        )
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        context['WAITING_ANSWER'] = user.tasks.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION)).count()
+        context['WAITING_ANSWER'] = user.tasks.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(
+            task_relation__status=UserTaskRelation.FOR_REVISION)).count()
         context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count()
         context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).count()
         return context
 
 
-class TaskCaseListAdmin(MyLoginRequiredMixin, ListView):
+class TaskCaseListAdmin(AdminRequiredMixin, ListView):
+    """GenericView листа группы вопросов от админа"""
     paginate_by = 5
     model = TaskCase
     template_name = 'tasks/taskcase_list_admin.html'
     context_object_name = 'task_cases'
 
 
-class CreateTaskCase(MyLoginRequiredMixin, CreateView):
+class CreateTaskCase(AdminRequiredMixin, CreateView):
+    """GenericView создания группы вопросов"""
     model = TaskCase
     fields = ('title', 'description')
     template_name = 'tasks/create_taskcase.html'
@@ -72,7 +73,8 @@ class CreateTaskCase(MyLoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class UpdateTaskCase(MyLoginRequiredMixin, UpdateView):
+class UpdateTaskCase(AdminRequiredMixin, UpdateView):
+    """GenericView изменения  группы вопросов"""
     model = TaskCase
     fields = ('title', 'description')
     template_name = 'tasks/create_taskcase.html'
@@ -90,7 +92,8 @@ class UpdateTaskCase(MyLoginRequiredMixin, UpdateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class DeleteTaskCase(MyLoginRequiredMixin, DeleteView):
+class DeleteTaskCase(AdminRequiredMixin, DeleteView):
+    """GenericView удаления группы вопросов"""
     model = TaskCase
     success_url = reverse_lazy('tasks:taskcase_list_admin')
     template_name = 'tasks/confirm_delete_taskcase.html'
@@ -103,6 +106,7 @@ class DeleteTaskCase(MyLoginRequiredMixin, DeleteView):
 
 
 class TaskListUser(MyLoginRequiredMixin, ListView):
+    """GenericView листа вопросов, назначенных юзеру"""
     paginate_by = 10
     model = Task
     template_name = 'tasks/task_list.html'
@@ -122,21 +126,24 @@ class TaskListUser(MyLoginRequiredMixin, ListView):
         return context
 
 
-class TaskListAdmin(MyLoginRequiredMixin, ListView):
+class TaskListAdmin(AdminRequiredMixin, ListView):
+    """GenericView листа вопросов от админа"""
     paginate_by = 10
     model = Task
     template_name = 'tasks/task_list_admin.html'
     context_object_name = 'task_list'
 
 
-class TaskDetailAdmin(MyLoginRequiredMixin, DetailView):
+class TaskDetailAdmin(AdminRequiredMixin, DetailView):
+    """GenericView одного  вопроса от админа"""
     model = Task
     template_name = 'tasks/task_detail_admin.html'
     context_object_name = 'task'
     pk_url_kwarg = 'pk'
 
 
-class TaskListAdminCheck(MyLoginRequiredMixin, ListView):
+class TaskListAdminCheck(AdminRequiredMixin, ListView):
+    """Проверка ответов со статусом ON_CHECK"""
     paginate_by = 10
     model = Task
     template_name = 'tasks/task_list_check.html'
@@ -153,6 +160,7 @@ class TaskListAdminCheck(MyLoginRequiredMixin, ListView):
 
 
 class TaskDetail(MyLoginRequiredMixin, DetailView):
+    """GenericView одного вопроса от пользователя"""
     model = Task
     template_name = 'tasks/task_detail.html'
     context_object_name = 'task'
@@ -173,7 +181,8 @@ class TaskDetail(MyLoginRequiredMixin, DetailView):
         return context
 
 
-class CreateTask(MyLoginRequiredMixin, CreateView):
+class CreateTask(AdminRequiredMixin, CreateView):
+    """GenericView создания вопроса"""
     model = Task
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
@@ -186,10 +195,12 @@ class CreateTask(MyLoginRequiredMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class UpdateTask(MyLoginRequiredMixin, UpdateView):
+class UpdateTask(AdminRequiredMixin, UpdateView):
+    """GenericView изменения вопроса"""
     model = Task
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
+
     # success_url = HttpResponseRedirect(self.request.path_info)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -200,24 +211,31 @@ class UpdateTask(MyLoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         messages.success(self.request, "Вопрос изменен")
+        form.save()
         # super().form_valid(form)
-        # return HttpResponseRedirect(self.get_success_url())
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        res = self.request.META.get('HTTP_REFERER')
-        # res = reverse('tasks:task_list_admin')
-        # print(self.request.GET)
-        # if 'page' in self.request.GET:
-        #     res += f"?page={self.request.GET['page']}"
-        #     # print(res)
-        return res
+        return HttpResponse('<script>history.go(-2)</script>')
+        # return super().form_valid(form)
+    # window.location.reload(history.back())
+    # window.history.go(-2);
+    # def get_success_url(self):
+    #     # res = self.request.META.get('HTTP_REFERER')
+    #     res = self.request.build_absolute_uri()
+    #     print(res)
+    #     # res1 = HttpResponse('<script>history.go(-2);</script>')
+    #     # print(res1)
+    #     # res = reverse('tasks:task_list_admin')
+    #     # print(self.request.GET)
+    #     # if 'page' in self.request.GET:
+    #     #     res += f"?page={self.request.GET['page']}"
+    #     #     # print(res)
+    #     return res
 
     # def get_success_url(self):
     #     return self.request.path
 
 
-class DeleteTask(MyLoginRequiredMixin, DeleteView):
+class DeleteTask(AdminRequiredMixin, DeleteView):
+    """GenericView удаления вопроса"""
     model = Task
     success_url = reverse_lazy('tasks:task_list_admin')
     template_name = 'tasks/confirm_delete_task.html'
@@ -231,6 +249,7 @@ class DeleteTask(MyLoginRequiredMixin, DeleteView):
 
 @login_required
 def add_answer(request, pk, id):
+    """Юзер добавляет ответ на вопрос"""
     task = get_object_or_404(Task, id=id)
     form = AnswerForm(request.POST or None)
     user = request.user
@@ -249,6 +268,7 @@ def add_answer(request, pk, id):
 
 @login_required
 def accept_answer(request, username, pk):
+    """Принять ответ юзера со стороны админа"""
     relation = get_object_or_404(UserTaskRelation, id=pk)
     relation.status = UserTaskRelation.ACCEPT
     relation.save()
@@ -259,6 +279,7 @@ def accept_answer(request, username, pk):
 
 
 class AnswerDetail(MyLoginRequiredMixin, DetailView):
+    """GenericView одного ответа"""
     model = Answer
     template_name = 'tasks/answer_detail.html'
     context_object_name = 'answer'
@@ -274,6 +295,7 @@ class AnswerDetail(MyLoginRequiredMixin, DetailView):
 
 @login_required
 def add_review(request, username, pk, id):
+    """Добавление ревью админом на ответ юзера"""
     answer = get_object_or_404(Answer, id=id)
     form = ReviewForm(request.POST or None)
     if form.is_valid():
@@ -290,25 +312,19 @@ def add_review(request, username, pk, id):
     return redirect('tasks:users_list')
 
 
-class UsersList(MyLoginRequiredMixin, ListView):
+class UsersList(ListView, AdminRequiredMixin):
+    """GenericView листа юзеров"""
     model = User
     template_name = 'tasks/users.html'
     context_object_name = 'users'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['NEW'] = 'NEW'
-        # context['users'] = User.objects.annotate(
-        #     NEW=Count('tasks'),
-        #     new2=Count('task_case')
-        # )
-        # context['NEW'] = User.objects.filter(task_relation__status=UserTaskRelation.NEW, username=OuterRef('username')).count()
-        # context['ON_CHECK'] = UserTaskRelation.objects.filter(status=UserTaskRelation.ON_CHECK).count()
-        # context['ACCEPT'] = UserTaskRelation.objects.filter(status=UserTaskRelation.ACCEPT).count()
         return context
 
     def get_queryset(self):
-        note_count = User.objects.annotate(count=Count('notes')).values('count').order_by('-date_joined').filter(pk=OuterRef('pk'))
+        note_count = User.objects.annotate(count=Count('notes')).values('count').order_by('-date_joined').filter(
+            pk=OuterRef('pk'))
         NEW = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW))
         ON_CHECK = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK))
         ACCEPT = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT))
@@ -326,6 +342,7 @@ class UsersList(MyLoginRequiredMixin, ListView):
 
 
 class AddTaskTaskCase(MyLoginRequiredMixin, UpdateView):
+    """Добавление вопросов в группу вопросов"""
     model = TaskCase
     form_class = TaskFormTaskcase
     context_object_name = 'taskcase'
@@ -334,6 +351,7 @@ class AddTaskTaskCase(MyLoginRequiredMixin, UpdateView):
 
 
 class AddTaskCaseUsers(MyLoginRequiredMixin, UpdateView):
+    """Добавление юзеров в группу вопросов"""
     model = TaskCase
     form_class = TaskFormTaskcaseUser
     context_object_name = 'taskcase'
@@ -361,6 +379,7 @@ class AddTaskCaseUsers(MyLoginRequiredMixin, UpdateView):
 
 @login_required()
 def complete_taskcase(request, pk):
+    """Завершить выполнение группы вопросов пользователем"""
     taskcase = get_object_or_404(TaskCase, id=pk)
     user = request.user
     for task in taskcase.tasks.all():
@@ -368,23 +387,3 @@ def complete_taskcase(request, pk):
     user.task_case.remove(taskcase)
     return redirect('tasks:taskcase_list')
 
-# @login_required
-# def add_taskcase(request, pk):
-#     user = get_object_or_404(User, id=pk)
-#     form = TaskCaseForm(request.POST or None)
-#     if form.is_valid():
-#         test_case = form.save(commit=False)
-#         test_case.owner = request.user
-#         test_case.save()
-#     return redirect('tracks:tracks')
-
-# @login_required
-# def add_task(request, pk):
-#     taskcase = get_object_or_404(TaskCase, id=pk)
-#     user = request.user
-#     relation, created = UserTaskCaseRelation.objects.get_or_create(
-#         user=user,
-#         task_case=taskcase,
-#     )
-#     relation.save()
-#     return redirect(request.META.get('HTTP_REFERER'))

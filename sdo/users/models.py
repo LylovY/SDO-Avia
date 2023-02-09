@@ -55,6 +55,12 @@ class User(AbstractUser):
         related_name='users',
         blank=True,
         null=True,
+    ),
+    parol = models.CharField(
+        'Пароль_админ',
+        max_length=15,
+        blank=True,
+        null=True,
     )
 
     class Meta:
