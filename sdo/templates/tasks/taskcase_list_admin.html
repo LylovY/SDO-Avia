@@ -13,7 +13,7 @@
 	{% for task_case in task_cases %}
 	<div class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		<div class="h4 pt-5 d-flex justify-content-between">
-			<div class="row">
+			<div>
 				{{ task_case.title }}
 			</div>
 			<div>
@@ -32,7 +32,7 @@
 		<div align="justify">
 			<p>{{ task_case.description }}</p>
 		</div>
-		<div class="h5 pt-4 row">
+		<div class="h5 pt-4">
 		 	Список вопросов:
 		</div>
 		<ul class="list-group-numbered" style="color:DimGrey;">
@@ -44,7 +44,8 @@
 			</li>
 			{% endfor %}
 		</ul>
-		<div class="h5 pt-4 row">
+		{% if task_case.users.all.count > 0 %}
+		<div class="h5 pt-4">
 		   Назначен сотрудникам:
 		</div>
 		<ul style="color:DimGrey;">
@@ -52,6 +53,7 @@
 			<li>{{ user }}</li>
 			{% endfor %}
 		</ul>
+		{% endif %}
 		<div class="d-flex justify-content-end">
 			<a class="btn addbutton ms-2" href="{% url 'tasks:add_task_taskcase' task_case.id %}">
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
