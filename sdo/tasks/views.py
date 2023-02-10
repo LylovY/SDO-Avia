@@ -40,15 +40,15 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
             WAITING_ANSWER=Subquery(task_count_new),
             ON_CHECK=Subquery(task_count_oncheck),
             ACCEPT=Subquery(task_count_accept),
-        )
+        ).prefetch_related('tasks', 'users')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         context['WAITING_ANSWER'] = user.tasks.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(
             task_relation__status=UserTaskRelation.FOR_REVISION)).count()
-        context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count()
-        context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).count()
+        context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).prefetch_related('tasks', 'task_case').count()
+        context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).prefetch_related('tasks', 'task_case').count()
         context['title'] = 'СДО авиа'
         return context
 
@@ -60,6 +60,9 @@ class TaskCaseListAdmin(AdminRequiredMixin, ListView):
     template_name = 'tasks/taskcase_list_admin.html'
     context_object_name = 'task_cases'
     extra_context = {'title': 'Блоки вопросов'}
+
+    def get_queryset(self):
+        return TaskCase.objects.prefetch_related('tasks', 'users')
 
 
 class CreateTaskCase(AdminRequiredMixin, CreateView):
@@ -139,6 +142,9 @@ class TaskListAdmin(AdminRequiredMixin, ListView):
     template_name = 'tasks/task_list_admin.html'
     context_object_name = 'task_list'
     extra_context = {'title': 'Список вопросов'}
+
+    def get_queryset(self):
+        return Task.objects.prefetch_related('task_case', 'users')
 
 
 class TaskDetailAdmin(AdminRequiredMixin, DetailView):
@@ -340,14 +346,16 @@ class UsersList(AdminRequiredMixin, ListView):
         note_count = User.objects.annotate(count=Count('notes')).values('count').order_by('-date_joined').filter(
             pk=OuterRef('pk'))
         NEW = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW))
+        FOR_REVISION = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.FOR_REVISION))
         ON_CHECK = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK))
         ACCEPT = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT))
         return User.objects.annotate(
             note_count=Subquery(note_count),
             NEW=NEW,
+            FOR_REVISION=FOR_REVISION,
             ON_CHECK=ON_CHECK,
             ACCEPT=ACCEPT
-            ).order_by('-ON_CHECK')
+            ).order_by('-ON_CHECK', '-NEW').prefetch_related('tasks', 'task_case')
         # ).annonate(
         #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
         #     ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
