@@ -47,8 +47,10 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
         user = self.request.user
         context['WAITING_ANSWER'] = user.tasks.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(
             task_relation__status=UserTaskRelation.FOR_REVISION)).count()
-        context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).prefetch_related('tasks', 'task_case').count()
-        context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).prefetch_related('tasks', 'task_case').count()
+        context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).prefetch_related(
+            'tasks', 'task_case').count()
+        context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).prefetch_related('tasks',
+                                                                                                              'task_case').count()
         context['title'] = 'СДО авиа'
         return context
 
@@ -169,8 +171,10 @@ class TaskListAdminCheck(AdminRequiredMixin, ListView):
         return context
 
     def get_queryset(self):
-        return Task.objects.filter(users__username=self.kwargs.get('username'),
-                                   task_relation__status=UserTaskRelation.ON_CHECK)
+        return Task.objects.filter(
+            Q(task_relation__status=UserTaskRelation.ON_CHECK) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
+            users__username=self.kwargs.get('username'),
+        )
 
 
 class TaskDetail(MyLoginRequiredMixin, DetailView):
@@ -355,7 +359,7 @@ class UsersList(AdminRequiredMixin, ListView):
             FOR_REVISION=FOR_REVISION,
             ON_CHECK=ON_CHECK,
             ACCEPT=ACCEPT
-            ).order_by('-ON_CHECK', '-NEW').prefetch_related('tasks', 'task_case')
+        ).order_by('-ON_CHECK', '-NEW').prefetch_related('tasks', 'task_case')
         # ).annonate(
         #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
         #     ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
@@ -410,4 +414,3 @@ def complete_taskcase(request, pk):
         user.tasks.remove(task)
     user.task_case.remove(taskcase)
     return redirect('tasks:taskcase_list')
-
