@@ -18,6 +18,7 @@ class CreateUser(CreateView, SuccessMessageMixin, AdminRequiredMixin, ):
     template_name = 'users/create_user.html'
     success_url = reverse_lazy('tasks:users_list')
     success_message = 'Аккаунт добавлен'
+    extra_context = {'title': 'Создать аккаунт'}
 
     def form_valid(self, form):
         messages.success(self.request, "Пользователь создан")
@@ -34,6 +35,7 @@ class UpdateUser(UpdateView, AdminRequiredMixin):
     slug_field = 'username'
     slug_url_kwarg = 'username'
     success_url = reverse_lazy('tasks:users_list')
+    extra_context = {'title': 'Изменить аккаунт'}
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,6 +60,7 @@ class DeleteUser(DeleteView, SuccessMessageMixin, AdminRequiredMixin):
     template_name = 'users/confirm_delete_user.html'
     context_object_name = 'user'
     success_message = 'Аккаунт удален'
+    extra_context = {'title': 'Удалить аккаунт'}
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -73,6 +76,7 @@ class TaskCaseUser(UpdateView, AdminRequiredMixin, ):
     context_object_name = 'user'
     template_name = 'users/add_taskcase_user.html'
     success_url = reverse_lazy('tasks:users_list')
+    extra_context = {'title': 'Добавить блок вопросов пользователю'}
 
     def form_valid(self, form):
         self.object.tasks.clear()
@@ -105,3 +109,4 @@ class AddTaskUser(UpdateView, AdminRequiredMixin, ):
     context_object_name = 'user'
     template_name = 'users/add_task_user.html'
     success_url = reverse_lazy('tasks:users_list')
+    extra_context = {'title': 'Добавить вопросы пользователю'}

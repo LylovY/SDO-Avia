@@ -49,6 +49,7 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
             task_relation__status=UserTaskRelation.FOR_REVISION)).count()
         context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count()
         context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).count()
+        context['title'] = 'СДО авиа'
         return context
 
 
@@ -58,6 +59,7 @@ class TaskCaseListAdmin(AdminRequiredMixin, ListView):
     model = TaskCase
     template_name = 'tasks/taskcase_list_admin.html'
     context_object_name = 'task_cases'
+    extra_context = {'title': 'Блоки вопросов'}
 
 
 class CreateTaskCase(AdminRequiredMixin, CreateView):
@@ -66,6 +68,7 @@ class CreateTaskCase(AdminRequiredMixin, CreateView):
     fields = ('title', 'description')
     template_name = 'tasks/create_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
+    extra_context = {'title': 'Создать блок вопросов'}
 
     def form_valid(self, form):
         messages.success(self.request, "Группа вопросов создана")
@@ -80,6 +83,7 @@ class UpdateTaskCase(AdminRequiredMixin, UpdateView):
     template_name = 'tasks/create_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
     context_object_name = 'taskcase'
+    extra_context = {'title': 'Изменить блок вопросов'}
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,6 +103,7 @@ class DeleteTaskCase(AdminRequiredMixin, DeleteView):
     template_name = 'tasks/confirm_delete_taskcase.html'
     context_object_name = 'taskcase'
     success_message = "Группа вопросов удалена"
+    extra_context = {'title': 'Удаление блока вопросов'}
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -111,6 +116,7 @@ class TaskListUser(MyLoginRequiredMixin, ListView):
     model = Task
     template_name = 'tasks/task_list.html'
     context_object_name = 'task_list'
+    extra_context = {'title': 'Список вопросов'}
 
     def get_queryset(self):
         return Task.objects.filter(task_case=self.kwargs['pk']).annotate(
@@ -132,6 +138,7 @@ class TaskListAdmin(AdminRequiredMixin, ListView):
     model = Task
     template_name = 'tasks/task_list_admin.html'
     context_object_name = 'task_list'
+    extra_context = {'title': 'Список вопросов'}
 
 
 class TaskDetailAdmin(AdminRequiredMixin, DetailView):
@@ -148,6 +155,7 @@ class TaskListAdminCheck(AdminRequiredMixin, ListView):
     model = Task
     template_name = 'tasks/task_list_check.html'
     context_object_name = 'task_list'
+    extra_context = {'title': 'Проверка'}
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -165,6 +173,7 @@ class TaskDetail(MyLoginRequiredMixin, DetailView):
     template_name = 'tasks/task_detail.html'
     context_object_name = 'task'
     pk_url_kwarg = 'id'
+    extra_context = {'title': 'Вопросы'}
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -187,6 +196,7 @@ class CreateTask(AdminRequiredMixin, CreateView):
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
     success_url = reverse_lazy('tasks:task_list_admin')
+    extra_context = {'title': 'Создать вопрос'}
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -200,6 +210,7 @@ class UpdateTask(AdminRequiredMixin, UpdateView):
     model = Task
     fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
+    extra_context = {'title': 'Изменить вопрос'}
 
     # success_url = HttpResponseRedirect(self.request.path_info)
 
@@ -241,6 +252,7 @@ class DeleteTask(AdminRequiredMixin, DeleteView):
     template_name = 'tasks/confirm_delete_task.html'
     context_object_name = 'task'
     success_message = "Вопрос удален"
+    extra_context = {'title': 'Удалить вопрос'}
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
@@ -318,6 +330,7 @@ class UsersList(AdminRequiredMixin, ListView):
     model = User
     template_name = 'tasks/users.html'
     context_object_name = 'users'
+    extra_context = {'title': 'Сотрудники'}
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -349,6 +362,7 @@ class AddTaskTaskCase(MyLoginRequiredMixin, UpdateView):
     context_object_name = 'taskcase'
     template_name = 'tasks/add_task_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
+    extra_context = {'title': 'Добавить вопросы в блок '}
 
 
 class AddTaskCaseUsers(MyLoginRequiredMixin, UpdateView):
@@ -358,6 +372,7 @@ class AddTaskCaseUsers(MyLoginRequiredMixin, UpdateView):
     context_object_name = 'taskcase'
     template_name = 'tasks/add_user_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
+    extra_context = {'title': 'Добавить сотрудников в блок '}
 
     def form_valid(self, form):
         # self.object.tasks.clear()
