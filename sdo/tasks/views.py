@@ -151,7 +151,7 @@ class TaskListAdminCheck(AdminRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.kwargs['username']
+        context['user'] = self.kwargs['username']
         return context
 
     def get_queryset(self):
@@ -171,9 +171,9 @@ class TaskDetail(MyLoginRequiredMixin, DetailView):
         taskcase = self.kwargs['pk']
         task = self.kwargs['id']
         user = self.request.user
-        relation, _ = UserTaskRelation.objects.get_or_create(
+        relation = UserTaskRelation.objects.get(
             user=user,
-            task_id=task,
+            task=task,
         )
         context['form'] = AnswerForm
         context['taskcase'] = taskcase
@@ -255,13 +255,14 @@ def add_answer(request, pk, id):
     user = request.user
     if form.is_valid():
         answer = form.save(commit=False)
-        relation, created = UserTaskRelation.objects.get_or_create(
+        relation = UserTaskRelation.objects.get(
             user=user,
             task=task,
         )
         relation.status = UserTaskRelation.ON_CHECK
         relation.save()
         answer.relation = relation
+        answer.author = request.user
         answer.save()
     return redirect('tasks:task_list', pk)
 

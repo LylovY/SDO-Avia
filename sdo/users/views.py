@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, UpdateView
 
 from core.views import AdminRequiredMixin
+from tasks.models import UserTaskRelation
 from users.forms import CreationForm, TaskCaseForm, TaskFormUser
 from users.models import User
 
@@ -75,17 +76,18 @@ class TaskCaseUser(UpdateView, AdminRequiredMixin, ):
 
     def form_valid(self, form):
         self.object.tasks.clear()
+        self.object.task_relation.all().delete()
         taskcases = [taskcase for taskcase in form.cleaned_data['task_case']]
 
         for taskcase in taskcases:
             for task in taskcase.tasks.all():
                 self.object.tasks.add(task)
-        #             relation = UserTaskRelation.objects.create(
-        #                 user=self.object,
-        #                 task=task
-        #             )
-        #             relation.status = UserTaskRelation.NEW
-        #             relation.save()
+                # relation = UserTaskRelation.objects.create(
+                #     user=self.object,
+                #     task=task
+                # )
+                # relation.status = UserTaskRelation.NEW
+                # relation.save()
         # taskcase.tasks.filter(task_relation__user=self.object).status = UserTaskRelation.NEW
         # self.object.tasks.set(taskcase.tasks.all())
         # for task in taskcase.tasks.all():

@@ -28,17 +28,17 @@
 			<div class="card col-10 d-flex justify-content-start mt-5" style="border-color: Gainsboro; border-radius: 15px;">
 				<div class="card-body">
 					<div class="card-title" style="color: grey;">
-						Ответ сотрудника {{ user.username }}({{ user.first_name }}):
+						Ответ сотрудника {{ answer.author }}({{ answer.author.first_name }}):
 					</div>
 					<p class="card-text">
 						{{ answer.text|linebreaks }}
 					</p>
 					<div class="d-flex justify-content-end pt-3">
 						{% if forloop.last %}
-						<a class="btn addbutton me-2" href="{% url 'tasks:accept_answer' user.username relation.id %}">
+						<a class="btn addbutton me-2" href="{% url 'tasks:accept_answer' user relation.id %}">
 							Принять
 						</a>
-						<a class="btn sendbutton" href="{% url 'tasks:answer_detail' user.username relation.id answer.id %}">
+						<a class="btn sendbutton" href="{% url 'tasks:answer_detail' user relation.id answer.id %}">
 							На доработку
 						</a>
 						{% endif %}

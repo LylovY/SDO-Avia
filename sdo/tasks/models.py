@@ -108,6 +108,11 @@ class Answer(CreatedModel):
     text = models.TextField(
         'Ответ'
     )
+    author = models.ForeignKey(
+        User,
+        related_name='answers',
+        on_delete=models.CASCADE,
+    )
 
 
 class Review(CreatedModel):
