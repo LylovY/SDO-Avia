@@ -66,6 +66,14 @@ html, main{
     color: BlueViolet;
 }
 
+.qlink{
+    text-decoration: none;
+}
+
+.qlink:hover{
+    color: BlueViolet;
+}
+
 .greylink{
     color: BlueViolet;
     text-decoration: none;

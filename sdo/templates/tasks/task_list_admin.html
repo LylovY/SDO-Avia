@@ -13,7 +13,7 @@
 	{% for task in task_list %}
 	<div class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		<div class="h4 pt-5 d-flex justify-content-between">
-			<div class="row">
+			<div class="qlink" data-bs-toggle="collapse" href="#collapse{{ task.id }}" role="button" aria-expanded="false" aria-controls="collapse{{ task.id }}">
 				{{ task.title }}
 			</div>
 			<div>
@@ -29,20 +29,22 @@
 				</a>
 			</div>
 		</div>
-		<div align="justify">
-			<p>{{ task.description|linebreaks }}</p>
-		</div>
-		<div class="h5 pt-4 row">
-			Находится в блоке вопросов:
-		</div>
-		<div>
-			{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
-		</div>
-		<div class="h5 pt-4 row">
-		 Решение :
-		</div>
-		<div align="justify">
-			<p>{{ task.answer|linebreaks }}</p>
+		<div align="justify"  class="collapse ms-2 me-2" id="collapse{{ task.id }}">
+			<div>
+				<p>{{ task.description|linebreaks }}</p>
+			</div>
+			<div class="h5 pt-4 row">
+				Находится в блоке вопросов:
+			</div>
+			<div>
+				{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
+			</div>
+			<div class="h5 pt-4 row">
+			 Решение :
+			</div>
+			<div align="justify">
+				<p>{{ task.answer|linebreaks }}</p>
+			</div>
 		</div>
 	</div>
 	{% endfor %}
