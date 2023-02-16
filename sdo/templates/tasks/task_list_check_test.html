@@ -2,24 +2,17 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="container p-0">
-	<a class="nlink rounded p-3"
-		href="{% url 'tasks:taskcase_list' %}">
-		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
-			<path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
-		</svg>
-		Назад
-	</a>
+	<a class="nlink rounded p-3" href="javascript:history.back()">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+    </svg>
+    Назад
+  </a>
 	{% for task in task_list %}
-
-	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
-		<div class="h5 pt-5 d-flex mb-2">
-			<div class="me-auto"><a class="text-decoration-none text-reset"
-			                        href="{% if task.is_test %}
-																			{% url 'tasks:task_detail_test' taskcase task.id %}
-																		{% else %}
-																			{% url 'tasks:task_detail' taskcase task.id %}
-																		{% endif %}">{{ task.title }}</a>
-			</div>
+	<div class="shadow p-5 pt-0 mt-3 bg-body rounded">
+	    <div class="h2 pt-4 row">
+		   {{ task.title }}
+	    </div>
 			{% if task.status == 'NEW' %}
 				<div class="h5" style="color: FireBrick;">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-shield-plus" viewBox="0 0 16 16">
@@ -60,30 +53,68 @@
 					Принят
 				</div>
 			{% endif %}
-		</div>
-		<div align="justify">
-			<p>{{ task.description|linebreaks }}</p>
-		</div>
-		{% if task.is_test %}
-			{% if task.status == 'NEW' %}
-				<a class="btn addbutton" href="{% url 'tasks:task_detail_test' taskcase task.id  %}">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-						<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-					</svg>
-					Ответить
-				</a>
-			{% endif %}
-		{% else %}
-			{% if task.status not in 'CHECK, ACCEPT' %}
-				<a class="btn addbutton" href="{% url 'tasks:task_detail' taskcase task.id  %}">
-					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-						<path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-					</svg>
-					Добавить ответ
-				</a>
-			{% endif %}
-		{% endif %}
-	</article>
+			<div class='py-5 pb-0 pt-0' align="justify">
+        <p>{{ task.description|linebreaks }}</p>
+			</div>
+			<div>
+				Варианты:<br>
+				{% for variant in task.variants.all %}
+
+					{{ variant }} - {{ variant.correct }}
+				<br>
+				{% endfor %}
+			</div>
+			<div>
+			{% load user_filters %}
+			{% user_task_variant user task as variants %}
+				Ответы:<br>
+				{% for variant in variants %}
+
+					{{ variant }} - {{ variant.correct }}
+				<br>
+				{% endfor %}
+			</div>
+<!--		{% load user_filters %}-->
+<!--		{% user_task_relation task user as relation %}-->
+<!--		{% for answer in relation.answers.all %}-->
+<!--			<div class="card col-10 d-flex justify-content-start mt-5" style="border-color: Gainsboro; border-radius: 15px;">-->
+<!--				<div class="card-body">-->
+<!--					<div class="card-title" style="color: grey;">-->
+<!--						Ответ сотрудника {{ answer.author }}({{ answer.author.first_name }}):-->
+<!--					</div>-->
+<!--					<p class="card-text">-->
+<!--						{{ answer.text|linebreaks }}-->
+<!--					</p>-->
+<!--					<div class="d-flex justify-content-end pt-3">-->
+<!--						{% if forloop.last %}-->
+<!--						<a class="btn addbutton me-2" href="{% url 'tasks:accept_answer' user relation.id %}">-->
+<!--							Принять-->
+<!--						</a>-->
+<!--						<a class="btn sendbutton" href="{% url 'tasks:answer_detail' user relation.id answer.id %}">-->
+<!--							На доработку-->
+<!--						</a>-->
+<!--						{% endif %}-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		{% if answer.reviews.count > 0 %}-->
+<!--			{% for review in answer.reviews.all %}-->
+<!--				<div class="d-flex justify-content-end mt-5">-->
+<!--					<div class="card col-10" style="border-color: MediumPurple; border-radius: 15px;">-->
+<!--						<div class="card-body">-->
+<!--							<div class="card-title" style="color: MediumPurple;">-->
+<!--								Замечание:-->
+<!--							</div>-->
+<!--							<p class="card-text">-->
+<!--								{{ review.text|linebreaks }}-->
+<!--							</p>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			{% endfor %}-->
+<!--		{% endif %}-->
+<!--		{% endfor %}-->
+	</div>
 	{% endfor %}
 </div>
 {% endblock %}

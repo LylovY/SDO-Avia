@@ -1,9 +1,10 @@
 from django import forms
 from django.forms import models
+from django.shortcuts import get_object_or_404
 from django.utils.html import format_html
 from django import urls
 
-from tasks.models import Answer, Review, Task, TaskCase
+from tasks.models import Answer, Review, Task, TaskCase, Variant
 from users.models import User
 
 
@@ -83,3 +84,97 @@ class TaskFormTaskcaseUser(forms.ModelForm):
         instance.users.set(self.cleaned_data['users'])
         return instance
 
+
+class VariantForm(forms.ModelForm):
+    """Форма для ответа на вопрос"""
+    class Meta:
+        model = Variant
+        fields = ('text', 'correct')
+        widgets = {
+            'text': forms.Textarea(attrs={'cols': 50, 'rows': 5}),
+            'correct': forms.CheckboxInput()
+        }
+
+
+class TestForm(forms.ModelForm):
+    """Форма для ответа на вопрос"""
+    def __init__(self, *args, **kwargs):
+        task_id = kwargs.pop("task", None)
+        # user = kwargs.pop("user", None)
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        self.fields['variants'].queryset = Variant.objects.filter(
+            task=task_id
+        )
+
+    variants = forms.ModelMultipleChoiceField(
+        queryset=Variant.objects.none(),
+        label='Варианты',
+        help_text='Выберите правильные',
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = User
+        fields = ('variants',)
+
+
+class CreateTaskForm(forms.ModelForm):
+    """Форма для ревью на ответы"""
+    def __init__(self, *args, **kwargs):
+        super(CreateTaskForm, self).__init__(*args, **kwargs)
+        self.fields['is_test'].disabled = True
+
+    class Meta:
+        model = Task
+        fields = ('title', 'description', 'answer', 'task_case', 'is_test')
+
+
+class CreateTaskTestForm(forms.ModelForm):
+    """Форма для ревью на ответы"""
+
+    def __init__(self, *args, **kwargs):
+        super(CreateTaskTestForm, self).__init__(*args, **kwargs)
+        self.fields['is_test'].disabled = True
+        self.fields['is_test'].initial = True
+
+    class Meta:
+        model = Task
+        fields = ('title', 'description', 'answer', 'task_case', 'is_test')
+        # widgets = {
+        #     'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
+        # }
+
+    # def save(self, *args, **kwargs):
+    #     instance = super().save(*args, **kwargs)
+    #     user = get_object_or_404(User, username__id=self.cleaned_data['user'])
+    #     user.variants.set(self.cleaned_data['variants'])
+    #     return instance
+
+    # def __init__(self, *args, **kwargs):
+    #     author_id = kwargs.pop("user", None)
+    #     forms.ModelForm.__init__(self, *args, **kwargs)
+    #     self.fields['directories'].queryset = Directory.objects.filter(
+    #         owner=author_id
+    #     )
+    #
+    # directories = forms.ModelMultipleChoiceField(
+    #     queryset=Directory.objects.none(),
+    #     label='Папки',
+    #     help_text='Please select the article to recover',
+    #     widget=forms.CheckboxSelectMultiple,
+    #     required=False,
+    # )
+
+    # class Meta:
+    #     model = Track
+    #     fields = ('directories',)
+
+    # def __init__(self, *args, **kwargs):
+    #     super().__init__(*args, **kwargs)
+    #     self.fields['users'].initial = self.instance.users.all()
+    #
+    # def save(self, *args, **kwargs):
+    #     instance = super().save(*args, **kwargs)
+    #     instance.users.set(self.cleaned_data['users'])
+    #     return instance

@@ -13,22 +13,22 @@
     <div class="shadow p-5 pt-0 mt-3 bg-body rounded">
       <div class="pt-4 form-text text-muted d-flex justify-content-end">
         {% if is_edit %}
-          Редактировать блок вопросов
+          Редактировать тест
         {% else %}
-          Новый блок вопросов
+          Новый тест
         {% endif %}
       </div>
-      <div class="card-body pt-0">
+      <div class="card-body">
         {% load user_filters %}
         <form enctype="multipart/form-data" method="post"
         action="{% if is_edit %}
-                  {% url 'tasks:update_taskcase' taskcase.id %}
+                  {% url 'tasks:update_task' task.id %}
                 {% else %}
-                  {% url 'tasks:create_taskcase' %}
+                  {% url 'tasks:create_test' %}
                 {% endif %}">
         {% csrf_token %}
         {% for field in form %}
-          {% if field.label == 'Тест' %}
+        {% if field.label == 'Тест' %}
                 <div class="form-check">
                     {{ field.label }}
                     <label for="{{ field.id_for_label }}">
@@ -60,7 +60,7 @@
           {% endif %}
         {% endfor %}
           <div class="d-flex justify-content-end">
-            <button type="submit" class="btn sendbutton">
+            <button class="btn sendbutton">
               {% if is_edit %}
                 Сохранить
               {% else %}

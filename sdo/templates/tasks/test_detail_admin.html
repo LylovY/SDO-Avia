@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load user_filters %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+
+<div class="container p-0">
+	<a class="nlink rounded p-3"
+		 href="javascript:history.back()">
+		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+			<path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+		</svg>
+		Назад</a>
+	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
+		<div class="h4 pt-5 d-flex justify-content-between">
+			<div class="row">
+				{{ test.title }}
+			</div>
+			<div>
+				<a class="btn text-decoration-none ms-2 greylink" href="#">
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+						<path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+					</svg>
+				</a>
+			</div>
+		</div>
+		<div align="justify">
+			<p>{{ test.description|linebreaks }}</p>
+		</div>
+		{% for variant in test.variants.all %}
+			<div class="card col-10 d-flex justify-content-start mt-5" style="border-color: Gainsboro; border-radius: 15px;">
+				<div class="card-body">
+					<p class="card-text">
+						{{ variant.text|linebreaks }}
+					</p>
+					<p class="card-text">
+						{{ variant.correct|linebreaks }}
+					</p>
+				</div>
+			</div>
+		{% endfor %}
+			<h style="color:DimGray">Вариант</h>
+			<div class="card-body p-0">
+				<form method="post" action="{% url 'tasks:add_variant' test.id %}">
+					{% csrf_token %}
+					<div class="form-group mb-2">
+						{{ form.text|addclass:"form-control" }}
+					</div>
+					<div class="form-group mb-2">
+						{{ form.correct.label }}
+						{{ form.correct }}
+					</div>
+					<button class="btn sendbutton" type="submit">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+							<path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+						</svg>
+						Добавить
+					</button>
+				</form>
+			</div>
+	</article>
+</div>
+{% endblock %}

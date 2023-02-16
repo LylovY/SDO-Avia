@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from tasks.models import UserTaskCaseRelation, UserTaskRelation
+from tasks.models import UserTaskCaseRelation, UserTaskRelation, Variant
 from users.models import User
 
 # admin.site.register(User)
@@ -15,6 +15,10 @@ class UserTaskRelationInline(admin.TabularInline):
     model = UserTaskRelation
     extra = 1
 
+
+# class VariantInline(admin.TabularInline):
+#     model = Variant
+#     extra = 1
 
 @admin.register(User)
 class UserAdmin(UserAdmin):
@@ -40,4 +44,5 @@ class UserAdmin(UserAdmin):
         },
          ),
         (("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (None, {"fields": ('variants',)}),
     )

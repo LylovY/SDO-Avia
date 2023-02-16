@@ -24,11 +24,12 @@
 		<div align="justify">
 			<p>{{ task.description|linebreaks }}</p>
 		</div>
-		{% if task.variants.count > 0 %}
+		{% if relation.status == 'NEW' %}
 			<div class="card-body">
 	      <form method="post" action="{% url 'tasks:add_variant' taskcase task.id %}">
 	        {% csrf_token %}
-	        {{ form }}
+		      Варианты
+	        {{ form.variants|addclass:"p-0 m-0 list-unstyled" }}
 		      {% for ans in request.user.variants.all %}
 		      {{ ans }}
 		      {% endfor %}
@@ -36,54 +37,26 @@
 	          Применить
 	        </button>
 	      </form>
-	    </div>
-		{% else %}
-			{% for answer in relation.answers.all %}
-				<div class="card col-10 d-flex justify-content-start mt-5" style="border-color: Gainsboro; border-radius: 15px;">
-					<div class="card-body">
-						<div class="card-title" style="color: grey;">
-							Ответ сотрудника {{ user.username }}({{ user.first_name }}):
-						</div>
-						<p class="card-text">
-							{{ answer.text|linebreaks }}
-						</p>
-					</div>
-				</div>
-			{% if answer.reviews.count > 0 %}
-				{% for review in answer.reviews.all %}
-					<div class="d-flex justify-content-end mt-5">
-						<div class="card col-10" style="border-color: MediumPurple; border-radius: 15px;">
-							<div class="card-body">
-								<div class="card-title" style="color: MediumPurple;">
-									Замечание:
-								</div>
-								<p class="card-text">
-									{{ review.text|linebreaks }}
-								</p>
-							</div>
-						</div>
-					</div>
+				{% else %}
+				<div class="card-body">
+	      Ответы пользователя:
+        {% for answer in user_variants %}
+					{{ answer }}
 				{% endfor %}
-			{% endif %}
-			{% endfor %}
-			{% if relation.status not in 'CHECK, ACCEPT' %}
-				<h style="color:DimGray">Решение</h>
-				<div class="card-body p-0">
-					<form method="post" action="{% url 'tasks:add_answer' taskcase task.id %}">
-						{% csrf_token %}
-						<div class="form-group mb-2">
-							{{ form.text|addclass:"form-control" }}
-						</div>
-						<button class="btn sendbutton" type="submit">
-							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
-								<path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
-							</svg>
-							Отправить
-						</button>
-					</form>
-				</div>
-			{% endif %}
-		{% endif %}
-	</article>
+				<br>
+				Верные ответы:
+        {% for answer in correct_variants %}
+					{{ answer }}
+				{% endfor %}
+	    </div>
+				<a class="nlink rounded p-3"
+				 href="{% url 'tasks:task_list' taskcase %}">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+					<path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+				</svg>
+				Продолжить</a>
+				{% endif %}
+	    </div>
+		</article>
 </div>
 {% endblock %}

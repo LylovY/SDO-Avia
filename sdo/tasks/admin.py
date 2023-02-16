@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from tasks.models import Answer, Review, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation
+from tasks.models import Answer, Review, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation, Variant
 
 
 class AnswerInline(admin.TabularInline):
@@ -24,6 +24,7 @@ class AnswerAdmin(admin.ModelAdmin):
 admin.site.register(TaskCase)
 admin.site.register(Task)
 admin.site.register(Review)
+admin.site.register(Variant)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(UserTaskCaseRelation)
 admin.site.register(UserTaskRelation, UserTaskRelationAdmin)

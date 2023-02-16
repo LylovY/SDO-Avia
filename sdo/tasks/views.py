@@ -1,14 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, F, Func, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, F, Func, OuterRef, Q, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from core.views import AdminRequiredMixin, MyLoginRequiredMixin
-from tasks.forms import AnswerForm, ReviewForm, TaskFormTaskcase, TaskFormTaskcaseUser
-from tasks.models import Answer, Task, TaskCase, UserTaskRelation
+from tasks.forms import AnswerForm, CreateTaskForm, CreateTaskTestForm, ReviewForm, TaskFormTaskcase, \
+    TaskFormTaskcaseUser, TestForm, \
+    VariantForm
+from tasks.models import Answer, Task, TaskCase, UserTaskRelation, Variant
 from users.models import User
 
 
@@ -36,10 +38,16 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
                                                 task_relation__status=UserTaskRelation.ACCEPT).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
+        task_count_wrong = Task.objects.filter(task_case=OuterRef('id'),
+                                                task_relation__user=self.request.user,
+                                                task_relation__status=UserTaskRelation.WRONG).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
         return TaskCase.objects.filter(task_case_relation__user=self.request.user).annotate(
             WAITING_ANSWER=Subquery(task_count_new),
             ON_CHECK=Subquery(task_count_oncheck),
             ACCEPT=Subquery(task_count_accept),
+            WRONG=Subquery(task_count_wrong),
         ).prefetch_related('tasks', 'users')
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -70,7 +78,7 @@ class TaskCaseListAdmin(AdminRequiredMixin, ListView):
 class CreateTaskCase(AdminRequiredMixin, CreateView):
     """GenericView создания группы вопросов"""
     model = TaskCase
-    fields = ('title', 'description')
+    fields = ('title', 'description', 'is_test')
     template_name = 'tasks/create_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
     extra_context = {'title': 'Создать блок вопросов'}
@@ -84,7 +92,7 @@ class CreateTaskCase(AdminRequiredMixin, CreateView):
 class UpdateTaskCase(AdminRequiredMixin, UpdateView):
     """GenericView изменения  группы вопросов"""
     model = TaskCase
-    fields = ('title', 'description')
+    fields = ('title', 'description', 'is_test')
     template_name = 'tasks/create_taskcase.html'
     success_url = reverse_lazy('tasks:taskcase_list_admin')
     context_object_name = 'taskcase'
@@ -146,7 +154,19 @@ class TaskListAdmin(AdminRequiredMixin, ListView):
     extra_context = {'title': 'Список вопросов'}
 
     def get_queryset(self):
-        return Task.objects.prefetch_related('task_case', 'users')
+        return Task.objects.prefetch_related('task_case', 'users').filter(is_test=False)
+
+
+class TaskListTestAdmin(AdminRequiredMixin, ListView):
+    """GenericView листа вопросов от админа"""
+    paginate_by = 10
+    model = Task
+    template_name = 'tasks/task_list_admin_test.html'
+    context_object_name = 'task_list'
+    extra_context = {'title': 'Список тестов'}
+
+    def get_queryset(self):
+        return Task.objects.prefetch_related('task_case', 'users').filter(is_test=True)
 
 
 class TaskDetailAdmin(AdminRequiredMixin, DetailView):
@@ -177,13 +197,37 @@ class TaskListAdminCheck(AdminRequiredMixin, ListView):
         )
 
 
-class TaskDetail(MyLoginRequiredMixin, DetailView):
+class TaskListAdminCheckTest(AdminRequiredMixin, ListView):
+    paginate_by = 10
+    model = Task
+    template_name = 'tasks/task_list_check_test.html'
+    context_object_name = 'task_list'
+    extra_context = {'title': 'Проверка теста'}
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.kwargs['username']
+        return context
+
+    def get_queryset(self):
+        # user_variants = Subquery(Variant.objects.filter(task=OuterRef('pk'), users__username=self.kwargs.get('username')).values('text')[:1])
+        return Task.objects.filter(users__username=self.kwargs.get('username'), is_test=True, task_case=self.kwargs.get('pk')).annotate(
+            status=Subquery(UserTaskRelation.objects.filter(
+                user__username=self.kwargs.get('username'),
+                task=OuterRef('pk'),
+            ).order_by('-created').values('status')[:1]),
+        )
+
+
+class TaskDetail(MyLoginRequiredMixin, DetailView, UpdateView):
     """GenericView одного вопроса от пользователя"""
     model = Task
     template_name = 'tasks/task_detail.html'
     context_object_name = 'task'
     pk_url_kwarg = 'id'
     extra_context = {'title': 'Вопросы'}
+    form_class = TestForm
+    # form_class = AnswerForm
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -194,19 +238,27 @@ class TaskDetail(MyLoginRequiredMixin, DetailView):
             user=user,
             task=task,
         )
-        context['form'] = AnswerForm
+        # context['answerform'] = AnswerForm
+        # context['testform'] = TestForm
         context['taskcase'] = taskcase
         context['relation'] = relation
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['task'] = self.object.id
+        # kwargs['user'] = self.request.user.id
+        return kwargs
 
 
 class CreateTask(AdminRequiredMixin, CreateView):
     """GenericView создания вопроса"""
     model = Task
-    fields = ('title', 'description', 'answer', 'task_case')
+    # fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
     success_url = reverse_lazy('tasks:task_list_admin')
     extra_context = {'title': 'Создать вопрос'}
+    form_class = CreateTaskForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -218,7 +270,7 @@ class CreateTask(AdminRequiredMixin, CreateView):
 class UpdateTask(AdminRequiredMixin, UpdateView):
     """GenericView изменения вопроса"""
     model = Task
-    fields = ('title', 'description', 'answer', 'task_case')
+    fields = ('title', 'description', 'answer', 'task_case', 'is_test')
     template_name = 'tasks/create_task.html'
     extra_context = {'title': 'Изменить вопрос'}
 
@@ -358,7 +410,8 @@ class UsersList(AdminRequiredMixin, ListView):
             NEW=NEW,
             FOR_REVISION=FOR_REVISION,
             ON_CHECK=ON_CHECK,
-            ACCEPT=ACCEPT
+            ACCEPT=ACCEPT,
+            tests=Exists(Task.objects.filter(users=OuterRef('pk'), is_test=True))
         ).order_by('-ON_CHECK', '-NEW').prefetch_related('tasks', 'task_case')
         # ).annonate(
         #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
@@ -414,3 +467,184 @@ def complete_taskcase(request, pk):
         user.tasks.remove(task)
     user.task_case.remove(taskcase)
     return redirect('tasks:taskcase_list')
+
+
+class CreateTest(AdminRequiredMixin, CreateView):
+    """GenericView создания вопроса"""
+    model = Task
+    # fields = ('title', 'description', 'task_case')
+    form_class = CreateTaskTestForm
+    template_name = 'tasks/create_test.html'
+    # success_url = reverse_lazy('tasks:test_detail_admin')
+    extra_context = {'title': 'Создать вопрос'}
+
+    def form_valid(self, form):
+        # form.instance.author = self.request.user
+        messages.success(self.request, "Тест создан")
+        super().form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self, **kwargs):
+        # if kwargs != None:
+        return reverse('tasks:test_detail_admin', kwargs={'pk': self.object.id})
+        # else:
+        #     return reverse_lazy('detail', args=(self.object.id,))
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(CreateTest, self).get_form_kwargs(
+            *args, **kwargs)
+        return kwargs
+
+
+class TestDetailAdmin(AdminRequiredMixin, DetailView):
+    """GenericView одного вопроса от пользователя"""
+    model = Task
+    template_name = 'tasks/test_detail_admin.html'
+    context_object_name = 'test'
+    pk_url_kwarg = 'pk'
+    extra_context = {'title': 'Тесты'}
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = VariantForm
+        return context
+
+
+@login_required
+def add_variant(request, pk):
+    """Юзер добавляет ответ на вопрос"""
+    task = get_object_or_404(Task, id=pk)
+    form = VariantForm(request.POST or None)
+    # user = request.user
+    if form.is_valid():
+        variant = form.save(commit=False)
+        variant.task = task
+        # answer.author = request.user
+        variant.save()
+    return redirect('tasks:test_detail_admin', pk)
+
+
+def add_variants_to_user(request, pk, id):
+    task = get_object_or_404(Task, id=id)
+    taskcase = get_object_or_404(TaskCase, pk=pk)
+    user = request.user
+    form = TestForm(request.POST, task=task, instance=user)
+    relation = UserTaskRelation.objects.get(
+        user=user,
+        task=task,
+    )
+    correct_variants = Variant.objects.filter(task=task, correct=True)
+    user_variants = user.variants.filter(task=task)
+    for field in form:
+        print("Field Error:", field.name, field.errors)
+    # print('test')
+    if request.POST and form.is_valid():
+        form = TestForm(request.POST, task=task, instance=user)
+        form.save(commit=False)
+        # form.save_m2m()
+
+        # user.variants.all().delete()
+        for variant in form.cleaned_data['variants']:
+            user.variants.add(variant)
+        user_variants = user.variants.filter(task=task)
+        if list(correct_variants) == list(user_variants):
+            relation.status = UserTaskRelation.ACCEPT
+        else:
+            relation.status = UserTaskRelation.WRONG
+        relation.save()
+        context = {
+            'task': task,
+            'taskcase': taskcase.id,
+            'relation': relation,
+            'correct_variants': correct_variants,
+            'user_variants': user_variants
+        }
+        # return redirect('tasks:task_detail', pk, id)
+        return render(request, 'tasks/task_detail_test_complete.html', context)
+    context = {'form': form,
+               'task': task,
+               'taskcase': taskcase.id,
+               'relation': relation,
+               'correct_variants': correct_variants,
+               'user_variants': user_variants
+               }
+    return render(request, 'tasks/task_detail_test.html', context)
+
+
+class TaskCaseListAdminTest(AdminRequiredMixin, ListView):
+    """GenericView листа группы вопросов от юзера"""
+    paginate_by = 3
+    model = TaskCase
+    template_name = 'tasks/test_case_list_admin.html'
+    context_object_name = 'task_case'
+
+    def get_queryset(self):
+        task_count_new = Task.objects.filter(
+            Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
+            task_case=OuterRef('id'),
+            task_relation__user__username=self.kwargs.get('username')).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        task_count_oncheck = Task.objects.filter(task_case=OuterRef('id'),
+                                                 task_relation__user__username=self.kwargs.get('username'),
+                                                 task_relation__status=UserTaskRelation.ON_CHECK).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        task_count_accept = Task.objects.filter(task_case=OuterRef('id'),
+                                                task_relation__user__username=self.kwargs.get('username'),
+                                                task_relation__status=UserTaskRelation.ACCEPT).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        task_count_wrong = Task.objects.filter(task_case=OuterRef('id'),
+                                                task_relation__user__username=self.kwargs.get('username'),
+                                                task_relation__status=UserTaskRelation.WRONG).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        return TaskCase.objects.filter(task_case_relation__user__username=self.kwargs.get('username'), is_test=True).annotate(
+            WAITING_ANSWER=Subquery(task_count_new),
+            ON_CHECK=Subquery(task_count_oncheck),
+            ACCEPT=Subquery(task_count_accept),
+            WRONG=Subquery(task_count_wrong),
+        ).prefetch_related('tasks', 'users')
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        context['WAITING_ANSWER'] = user.tasks.filter(Q(task_relation__status=UserTaskRelation.NEW) | Q(
+            task_relation__status=UserTaskRelation.FOR_REVISION)).count()
+        context['ON_CHECK'] = user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).prefetch_related(
+            'tasks', 'task_case').count()
+        context['ACCEPT'] = user.tasks.filter(task_relation__status=UserTaskRelation.ACCEPT).prefetch_related('tasks',
+                                                                                                              'task_case').count()
+        context['title'] = 'СДО авиа'
+        context['user'] = user
+        return context
+# class TestDetail(MyLoginRequiredMixin, UpdateView):
+#     """GenericView одного вопроса от пользователя"""
+#     model = Task
+#     template_name = 'tasks/task_detail.html'
+#     context_object_name = 'task'
+#     pk_url_kwarg = 'id'
+#     extra_context = {'title': 'Вопросы'}
+#     form_class = TestForm
+#
+#     def get_context_data(self, *, object_list=None, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         taskcase = self.kwargs['pk']
+#         task = self.kwargs['id']
+#         user = self.request.user
+#         relation = UserTaskRelation.objects.get(
+#             user=user,
+#             task=task,
+#         )
+        # context['answerform'] = AnswerForm
+        # context['testform'] = TestForm
+    #     context['taskcase'] = taskcase
+    #     # context['relation'] = relation
+    #     return context
+    #
+    # def get_form_kwargs(self):
+    #     kwargs = super().get_form_kwargs()
+    #     kwargs['task'] = self.object.id
+    #     # kwargs['user'] = self.request.user.id
+    #     return kwargs
