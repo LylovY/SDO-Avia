@@ -42,7 +42,7 @@
 			<ul class="list-unstyled">
 				{% for variant in task.variants.all %}
 				<li>
-					<div class="card mb-2 p-2 d-flex" style="border-radius:10px; border-size:2px; {% if variant.correct == True %}border-color:Green{% else %}border-color:Crimson;{% endif %}">
+					<div class="card mt-3 p-2 d-flex" style="border-radius:10px; border-size:2px; {% if variant.correct == True %}border-color:Green{% else %}border-color:Crimson;{% endif %}">
 						<div class="d-flex">
 							{% if variant.correct == True %}
 								<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="Green" class="bi bi-check-circle" viewBox="0 0 16 16">
