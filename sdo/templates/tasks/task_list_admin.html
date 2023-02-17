@@ -33,6 +33,12 @@
 			<div>
 				<p>{{ task.description|linebreaks }}</p>
 			</div>
+			<div class="h5 pt-4">
+			 Решение :
+			</div>
+			<div align="justify">
+				<p>{{ task.answer|linebreaks }}</p>
+			</div>
 			{% if task.task_case.all.count > 0 %}
 				<div class="h5 pt-4">
 					Находится в блоке вопросов:
@@ -41,12 +47,6 @@
 					{% for taskcase in task.task_case.all %} {{ taskcase }} {% endfor %}
 				</div>
 			{% endif %}
-			<div class="h5 pt-4">
-			 Решение :
-			</div>
-			<div align="justify">
-				<p>{{ task.answer|linebreaks }}</p>
-			</div>
 		</div>
 	</div>
 	{% endfor %}
