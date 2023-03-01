@@ -31,7 +31,9 @@
 		</div>
 		<div align="justify"  class="collapse ms-2 me-2" id="collapse{{ task.id }}">
 			<div>
-				<p>{{ task.description|linebreaks }}</p>
+				<pre>
+					<p>{{ task.description|linebreaks }}</p>
+				</pre>
 			</div>
 			{% if task.task_case.all.count > 0 %}
 				<div class="h5 pt-4">
@@ -45,7 +47,9 @@
 			 Решение :
 			</div>
 			<div align="justify">
-				<p>{{ task.answer|linebreaks }}</p>
+				<pre>
+					<p>{{ task.answer|linebreaks }}</p>
+				</pre>
 			</div>
 		</div>
 	</div>
