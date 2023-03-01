@@ -49,7 +49,9 @@
 			{% endif %}
 		</div>
 		<div align="justify">
-			<p>{{ task.description|linebreaks }}</p>
+			<pre>
+				<p>{{ task.description|linebreaks }}</p>
+			</pre>
 		</div>
 		{% if task.status not in 'CHECK, ACCEPT' %}
 			<a class="btn addbutton" href="{% url 'tasks:task_detail' taskcase task.id  %}">

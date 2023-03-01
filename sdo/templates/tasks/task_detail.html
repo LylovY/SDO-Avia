@@ -47,7 +47,9 @@
 			{% endif %}
 		</div>
 		<div align="justify">
-			<p>{{ task.description|linebreaks }}</p>
+			<pre>
+				<p>{{ task.description|linebreaks }}</p>
+			</pre>
 		</div>
 		{% for answer in relation.answers.all %}
 			<div class="card col-10 d-flex justify-content-start mt-5" style="border-color: Gainsboro; border-radius: 15px;">
