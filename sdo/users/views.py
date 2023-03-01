@@ -81,6 +81,7 @@ class TaskCaseUser(UpdateView, AdminRequiredMixin, ):
     def form_valid(self, form):
         self.object.tasks.clear()
         self.object.task_relation.all().delete()
+        self.object.variants.clear()
         taskcases = [taskcase for taskcase in form.cleaned_data['task_case']]
 
         for taskcase in taskcases:

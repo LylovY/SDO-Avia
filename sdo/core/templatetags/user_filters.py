@@ -2,6 +2,7 @@ from django import template
 from django.shortcuts import get_object_or_404
 
 from tasks.models import UserTaskRelation
+from users.models import User
 
 register = template.Library()
 
@@ -26,3 +27,9 @@ def task_on_check_count(status):
 def user_task_relation(task, user):
     relation = get_object_or_404(UserTaskRelation, user__username=user, task=task)
     return relation
+
+
+@register.simple_tag
+def user_task_variant(user, task):
+    user = get_object_or_404(User, username=user)
+    return user.variants.filter(task=task)

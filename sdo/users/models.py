@@ -56,6 +56,14 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
+    variants = models.ManyToManyField(
+        'tasks.Variant',
+        verbose_name='Варианты',
+        help_text='Варианты',
+        related_name='users',
+        blank=True,
+        null=True,
+    )
     parol = models.CharField(
         'Пароль_админ',
         max_length=15,

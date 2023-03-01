@@ -12,6 +12,10 @@ class TaskCase(CreatedTaskModel):
         on_delete=models.SET_NULL,
         null=True
     )
+    is_test = models.BooleanField(
+        'Тест',
+        default=False
+    )
 
     def __str__(self) -> str:
         return self.title
@@ -39,6 +43,10 @@ class Task(CreatedTaskModel):
         related_name='tasks',
         verbose_name='Группа вопросов',
         blank=True
+    )
+    is_test = models.BooleanField(
+        'Тест',
+        default=False
     )
 
     class Meta:
@@ -74,11 +82,13 @@ class UserTaskRelation(CreatedModel):
     ON_CHECK = 'CHECK'
     FOR_REVISION = 'REVISION'
     ACCEPT = 'ACCEPT'
+    WRONG = 'WRONG'
     TASK_STATUS = [
         (NEW, 'Новый'),
         (ON_CHECK, 'На проверке'),
         (FOR_REVISION, 'На доработку'),
         (ACCEPT, 'Принято'),
+        (WRONG, 'Ошибка')
     ]
     user = models.ForeignKey(
         User,
@@ -129,3 +139,20 @@ class Review(CreatedModel):
     def __str__(self) -> str:
         return self.text
 
+
+class Variant(CreatedModel):
+    task = models.ForeignKey(
+        Task,
+        related_name='variants',
+        on_delete=models.CASCADE,
+    )
+    text = models.TextField(
+        'Вариант'
+    )
+    correct = models.BooleanField(
+        'Правильный ответ?',
+        default=False
+    )
+
+    def __str__(self) -> str:
+        return self.text
