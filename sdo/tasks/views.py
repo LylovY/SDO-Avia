@@ -279,10 +279,11 @@ class CreateTask(AdminRequiredMixin, CreateView):
 class UpdateTask(AdminRequiredMixin, UpdateView):
     """GenericView изменения вопроса"""
     model = Task
-    fields = ('title', 'description', 'answer', 'task_case', 'is_test')
+    # fields = ('title', 'description', 'answer', 'task_case', 'is_test')
     template_name = 'tasks/create_task.html'
     extra_context = {'title': 'Изменить вопрос'}
     success_url = reverse_lazy('tasks:task_list_admin')
+    form_class = CreateTaskForm
 
     # success_url = HttpResponseRedirect(self.request.path_info)
 

@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'notes.apps.NotesConfig',
     'mathfilters',
+    'django_summernote',
 ]
 
 MIDDLEWARE = [
@@ -121,3 +122,12 @@ LOGIN_REDIRECT_URL = '/'
 # INTERNAL_IPS = [
 #     "127.0.0.1",
 # ]
+
+# SUMMERNOTE_THEME = 'bs5'
+
+SUMMERNOTE_CONFIG = {
+    'summernote': {
+        'width': '100%',
+        'height': '300',
+    }
+}

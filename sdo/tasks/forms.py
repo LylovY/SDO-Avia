@@ -3,6 +3,7 @@ from django.forms import models
 from django.shortcuts import get_object_or_404
 from django.utils.html import format_html
 from django import urls
+from django_summernote.widgets import SummernoteWidget
 
 from tasks.models import Answer, Review, Task, TaskCase, Variant
 from users.models import User
@@ -124,6 +125,8 @@ class CreateTaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(CreateTaskForm, self).__init__(*args, **kwargs)
         self.fields['is_test'].disabled = True
+
+    description = forms.CharField(widget=SummernoteWidget, label='Описание')
 
     class Meta:
         model = Task
