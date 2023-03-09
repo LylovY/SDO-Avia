@@ -44,13 +44,13 @@
 		</div>
 		<div align="justify"  class="collapse" id="collapse{{ task.id }}">
 			{{ task.description|linebreaks }}
-			<div class="h5 pt-4">
-			 	Ответы:
+			<div class="h5 pt-3 pb-2">
+			 	Варианты:
 			</div>
 			<ul class="list-unstyled">
 				{% for variant in task.variants.all %}
 				<li>
-					<div class="card mt-3 p-2 d-flex position-relative">
+					<div class="card mt-3 p-2 d-flex position-relative" style="border-radius:10px;">
 						{% if variant.correct == True %}
 						<span class="position-absolute top-0 start-0 translate-middle badge" style="color:Crimson; font-size:50%;">
 							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="Green" class="bi bi-check-circle" viewBox="0 0 16 16">

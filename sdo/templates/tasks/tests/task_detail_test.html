@@ -44,7 +44,7 @@
 	        {% csrf_token %}
 		      Варианты:
 					{% for field in form.variants %}
-					<div class="card mt-2 p-2">
+					<div class="card mt-3 p-4" style="border-radius:10px;">
 						{{ field }}
 					</div>
 					{% endfor %}
