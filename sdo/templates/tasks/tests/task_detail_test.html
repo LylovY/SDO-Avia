@@ -59,9 +59,15 @@
 				<div class="col-6 me-2">
 					Ответы пользователя:
 					{% for answer in user_variants %}
-						<div class="card p-3 mt-3">
+					{% if answer.correct %}
+						<div class="card p-3 mt-3" style="border-color:Green;">
 							{{ answer }}
 						</div>
+					{% else %}
+						<div class="card p-3 mt-3" style="border-color:Red;">
+							{{ answer }}
+						</div>
+					{% endif %}
 					{% endfor %}
 				</div>
 	      <div class="col-6 ms-2">

@@ -552,7 +552,7 @@ def update_variant(request, pk, id_variant):
         if form.is_valid():
             form.save()
         return redirect('tasks:test_detail_admin', pk)
-    template = 'tasks/test_detail_admin.html'
+    template = 'tasks/tests/test_detail_admin.html'
     context = {
         'form': form,
         'is_edit': True,
