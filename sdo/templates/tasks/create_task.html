@@ -18,7 +18,7 @@
           Новый вопрос
         {% endif %}
       </div>
-      <div class="card-body">
+      <div>
         {% load user_filters %}
         <form enctype="multipart/form-data" method="post"
         action="{% if is_edit %}
@@ -29,34 +29,32 @@
         {% csrf_token %}
         {% for field in form %}
           {% if field.label == 'Тест' %}
-                <div class="form-check">
-                    {{ field.label }}
-                    <label for="{{ field.id_for_label }}">
-                        {% if field.field.required %}
-                          <span class="required text-danger">*</span>
-                        {% endif %}
-                    </label>
-                  {{ field|addclass:'form-check-input' }}
-                  <br>
-                  {% if field.help_text %}
-                      <small
-                         id="{{ field.id_for_label }}-help"
-                         class="form-text text-muted">
-                        {{ field.help_text|safe }}
-                      </small>
-                    {% endif %}
-                </div>
-          {% else %}
-          <div class="form-group row my-3">
-            <label for="{{ field.id_for_label }}" style="color: grey; font-size: 90%;">
+            <div class="form-check">
               {{ field.label }}
+              <label for="{{ field.id_for_label }}">
                 {% if field.field.required %}
                   <span class="required text-danger">*</span>
                 {% endif %}
-            </label>
-              {# К полю ввода добавляем атрибут class #}
-              {{ field|addclass:'form-control' }}
-          </div>
+              </label>
+              {{ field|addclass:'form-check-input' }}
+              <br>
+              {% if field.help_text %}
+                <small id="{{ field.id_for_label }}-help" class="form-text text-muted">
+                  {{ field.help_text|safe }}
+                </small>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="form-group my-3">
+              <label for="{{ field.id_for_label }}" style="color: grey; font-size: 90%;">
+                {{ field.label }}
+                  {% if field.field.required %}
+                    <span class="required text-danger">*</span>
+                  {% endif %}
+              </label>
+                {# К полю ввода добавляем атрибут class #}
+                {{ field|addclass:'form-control' }}
+            </div>
           {% endif %}
         {% endfor %}
           <input type="hidden" name="page" value="{{ page }}">
