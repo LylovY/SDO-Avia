@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mathfilters %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="container p-0">
@@ -40,6 +41,7 @@
                     </svg>
                     Принято: {{ case.ACCEPT }}
                   </div>
+                  Результат: {{ case.ACCEPT|div:case.tasks.count|mul:100 }} %
                   <div>
                     {% if case.WAITING_ANSWER == 0 and case.ON_CHECK == 0 %}
                     <a class="btn addbutton p-1 pe-2" href="{% url 'tasks:complete_taskcase' case.id %}">

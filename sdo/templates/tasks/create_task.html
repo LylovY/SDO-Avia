@@ -22,7 +22,7 @@
         {% load user_filters %}
         <form enctype="multipart/form-data" method="post"
         action="{% if is_edit %}
-                  {% url 'tasks:update_task' task.id %}
+                  {% url 'tasks:update_task' task.id %}?page={{ page }}
                 {% else %}
                   {% url 'tasks:create_task' %}
                 {% endif %}">
@@ -59,6 +59,7 @@
           </div>
           {% endif %}
         {% endfor %}
+          <input type="hidden" name="page" value="{{ page }}">
           <div class="d-flex justify-content-end">
             <button class="btn sendbutton">
               {% if is_edit %}

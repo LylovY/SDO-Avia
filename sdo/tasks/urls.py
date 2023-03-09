@@ -10,7 +10,8 @@ from tasks.views import AddTaskCaseUsers, AddTaskTaskCase, AnswerDetail, CreateT
     TaskDetailAdmin, TaskListAdmin, \
     TaskListAdminCheck, TaskListAdminCheckTest, TaskListTestAdmin, TaskListUser, \
     TestDetailAdmin, UpdateTask, UpdateTaskCase, UsersList, \
-    accept_answer, add_answer, add_review, add_variant, add_variants_to_user, complete_taskcase
+    accept_answer, add_answer, add_review, add_variant, add_variants_to_user, complete_taskcase, delete_variant, \
+    update_variant
 from users.views import CreateUser, DeleteUser, TaskCaseUser, AddTaskUser, UpdateUser
 
 app_name = 'tasks'
@@ -44,6 +45,8 @@ urlpatterns = [
     path('tasks/create_test', CreateTest.as_view(), name='create_test'),
     path('tasks/tests/<int:pk>/', TestDetailAdmin.as_view(), name='test_detail_admin'),
     path('tasks/tests/<int:pk>/add_variant', add_variant, name='add_variant'),
+    path('tasks/tests/<int:pk>/<int:id_variant>/update_variant', update_variant, name='update_variant'),
+    path('tasks/tests/<int:pk>/<int:id_variant>/delete_variant', delete_variant, name='delete_variant'),
     path('tasks/<int:pk>/update/', UpdateTask.as_view(), name='update_task'),
     path('tasks/<int:pk>/delete', DeleteTask.as_view(), name='delete_task'),
     path('tasks_case/', TaskCaseListAdmin.as_view(), name='taskcase_list_admin'),

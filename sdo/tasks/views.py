@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db.models import Count, Exists, F, Func, OuterRef, Q, Subquery
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -154,6 +155,10 @@ class TaskListAdmin(AdminRequiredMixin, ListView):
     extra_context = {'title': 'Список вопросов'}
 
     def get_queryset(self):
+        search_term = self.request.GET.get('q')
+        if search_term:
+            return Task.objects.prefetch_related('task_case', 'users').filter(is_test=False,
+                                                                              title__icontains=search_term)
         return Task.objects.prefetch_related('task_case', 'users').filter(is_test=False)
 
 
@@ -161,11 +166,15 @@ class TaskListTestAdmin(AdminRequiredMixin, ListView):
     """GenericView листа вопросов от админа"""
     paginate_by = 10
     model = Task
-    template_name = 'tasks/task_list_admin_test.html'
+    template_name = 'tasks/tests/task_list_admin_test.html'
     context_object_name = 'task_list'
     extra_context = {'title': 'Список тестов'}
 
     def get_queryset(self):
+        search_term = self.request.GET.get('q')
+        if search_term:
+            return Task.objects.prefetch_related('task_case', 'users').filter(is_test=True,
+                                                                              title__icontains=search_term)
         return Task.objects.prefetch_related('task_case', 'users').filter(is_test=True)
 
 
@@ -200,7 +209,7 @@ class TaskListAdminCheck(AdminRequiredMixin, ListView):
 class TaskListAdminCheckTest(AdminRequiredMixin, ListView):
     paginate_by = 10
     model = Task
-    template_name = 'tasks/task_list_check_test.html'
+    template_name = 'tasks/tests/task_list_check_test.html'
     context_object_name = 'task_list'
     extra_context = {'title': 'Проверка теста'}
 
@@ -238,7 +247,7 @@ class TaskDetail(MyLoginRequiredMixin, DetailView, UpdateView):
             user=user,
             task=task,
         )
-        # context['answerform'] = AnswerForm
+        context['answerform'] = AnswerForm
         # context['testform'] = TestForm
         context['taskcase'] = taskcase
         context['relation'] = relation
@@ -273,23 +282,22 @@ class UpdateTask(AdminRequiredMixin, UpdateView):
     fields = ('title', 'description', 'answer', 'task_case', 'is_test')
     template_name = 'tasks/create_task.html'
     extra_context = {'title': 'Изменить вопрос'}
+    success_url = reverse_lazy('tasks:task_list_admin')
 
     # success_url = HttpResponseRedirect(self.request.path_info)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['current_page'] = self.request.GET.get('page', 1)
+        context['page'] = self.request.GET.get('page') or 1
         context['is_edit'] = True
         return context
 
-    def form_valid(self, form):
-        messages.success(self.request, "Вопрос изменен")
-        form.save()
-        # super().form_valid(form)
-        return HttpResponse('<script>history.go(-2)</script>')
+    # def form_valid(self, form):
+    #     messages.success(self.request, "Вопрос изменен")
+    #     form.save()
+    # # #     # super().form_valid(form)
+    #     return HttpResponse('<script>history.go(-2)</script>')
         # return super().form_valid(form)
-    # window.location.reload(history.back())
-    # window.history.go(-2);
     # def get_success_url(self):
     #     # res = self.request.META.get('HTTP_REFERER')
     #     res = self.request.build_absolute_uri()
@@ -305,6 +313,16 @@ class UpdateTask(AdminRequiredMixin, UpdateView):
 
     # def get_success_url(self):
     #     return self.request.path
+    def get_success_url(self):
+        # get the current page from the query parameters
+        # current_page = self.request.GET.get('page')
+        current_page = self.request.POST.get('page') or self.kwargs.get('page')
+        if current_page:
+            # redirect to the current page in pagination
+            return f"{reverse_lazy('tasks:task_list_admin')}?page={current_page}"
+        else:
+            # redirect to the default success URL
+            return super().get_success_url()
 
 
 class DeleteTask(AdminRequiredMixin, DeleteView):
@@ -470,11 +488,11 @@ def complete_taskcase(request, pk):
 
 
 class CreateTest(AdminRequiredMixin, CreateView):
-    """GenericView создания вопроса"""
+    """GenericView создания теста"""
     model = Task
     # fields = ('title', 'description', 'task_case')
     form_class = CreateTaskTestForm
-    template_name = 'tasks/create_test.html'
+    template_name = 'tasks/tests/create_test.html'
     # success_url = reverse_lazy('tasks:test_detail_admin')
     extra_context = {'title': 'Создать вопрос'}
 
@@ -499,7 +517,7 @@ class CreateTest(AdminRequiredMixin, CreateView):
 class TestDetailAdmin(AdminRequiredMixin, DetailView):
     """GenericView одного вопроса от пользователя"""
     model = Task
-    template_name = 'tasks/test_detail_admin.html'
+    template_name = 'tasks/tests/test_detail_admin.html'
     context_object_name = 'test'
     pk_url_kwarg = 'pk'
     extra_context = {'title': 'Тесты'}
@@ -523,8 +541,36 @@ def add_variant(request, pk):
         variant.save()
     return redirect('tasks:test_detail_admin', pk)
 
+@login_required
+def update_variant(request, pk, id_variant):
+    variant = get_object_or_404(Variant, id=id_variant)
+    form = VariantForm(instance=variant)
+    if request.method == 'POST':
+        form = VariantForm(
+            request.POST,
+            instance=variant)
+        if form.is_valid():
+            form.save()
+        return redirect('tasks:test_detail_admin', pk)
+    template = 'tasks/test_detail_admin.html'
+    context = {
+        'form': form,
+        'is_edit': True,
+        'test': pk,
+        'variant': id_variant
+    }
+    return render(request, template, context)
+
+
+@login_required
+def delete_variant(request, pk, id_variant):
+    variant = get_object_or_404(Variant, id=id_variant)
+    variant.delete()
+    return redirect('tasks:test_detail_admin', pk)
+
 
 def add_variants_to_user(request, pk, id):
+    '''Ответы юзера на тест'''
     task = get_object_or_404(Task, id=id)
     taskcase = get_object_or_404(TaskCase, pk=pk)
     user = request.user
@@ -535,8 +581,8 @@ def add_variants_to_user(request, pk, id):
     )
     correct_variants = Variant.objects.filter(task=task, correct=True)
     user_variants = user.variants.filter(task=task)
-    for field in form:
-        print("Field Error:", field.name, field.errors)
+    # for field in form:
+    #     print("Field Error:", field.name, field.errors)
     # print('test')
     if request.POST and form.is_valid():
         form = TestForm(request.POST, task=task, instance=user)
@@ -560,7 +606,7 @@ def add_variants_to_user(request, pk, id):
             'user_variants': user_variants
         }
         # return redirect('tasks:task_detail', pk, id)
-        return render(request, 'tasks/task_detail_test_complete.html', context)
+        return render(request, 'tasks/tests/task_detail_test_complete.html', context)
     context = {'form': form,
                'task': task,
                'taskcase': taskcase.id,
@@ -568,14 +614,14 @@ def add_variants_to_user(request, pk, id):
                'correct_variants': correct_variants,
                'user_variants': user_variants
                }
-    return render(request, 'tasks/task_detail_test.html', context)
+    return render(request, 'tasks/tests/task_detail_test.html', context)
 
 
 class TaskCaseListAdminTest(AdminRequiredMixin, ListView):
     """GenericView листа группы вопросов от юзера"""
     paginate_by = 3
     model = TaskCase
-    template_name = 'tasks/test_case_list_admin.html'
+    template_name = 'tasks/tests/test_case_list_admin.html'
     context_object_name = 'task_case'
 
     def get_queryset(self):

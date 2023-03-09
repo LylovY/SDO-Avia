@@ -23,7 +23,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'tasks.apps.TasksConfig',
     'core.apps.CoreConfig',
-    'notes.apps.NotesConfig'
+    'notes.apps.NotesConfig',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
@@ -35,6 +36,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # "debug_toolbar.middleware.DebugToolbarMiddleware",
+    # other middleware here
+    # 'core.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'sdo.urls'
