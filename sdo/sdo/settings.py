@@ -1,13 +1,16 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-qdrtxed!in!911k9md1h(v_f_*et-iw(0c#5r7klc%7soxst!8'
+SECRET_KEY = os.getenv('SECRET_KEY', default='password')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['45.8.250.93', '127.0.0.1', 'localhost', 'sdo-avia.sytes.net']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1')
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -36,9 +39,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # "debug_toolbar.middleware.DebugToolbarMiddleware",
-    # other middleware here
-    # 'core.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'sdo.urls'
