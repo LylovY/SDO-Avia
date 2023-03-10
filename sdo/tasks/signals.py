@@ -29,7 +29,6 @@ def delete_attachments(sender, instance, **kwargs):
     # Get all attachments related to the Task instance being deleted
     attachments = MyAttachment.objects.filter(task=instance)
     # Delete each attachment from the database and storage
-    print(attachments)
     for attachment in attachments:
         attachment_path = str(attachment.file)
         attachment.delete()
