@@ -129,5 +129,6 @@ SUMMERNOTE_CONFIG = {
     'summernote': {
         'width': '100%',
         'height': '300',
-    }
+    },
+    'attachment_model': 'tasks.MyAttachment',
 }

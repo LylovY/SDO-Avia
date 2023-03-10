@@ -1,4 +1,5 @@
 from django.db import models
+from django_summernote.models import AbstractAttachment
 
 from core.models import CreatedModel, CreatedTaskModel
 from users.models import User
@@ -56,6 +57,22 @@ class Task(CreatedTaskModel):
 
     def __str__(self) -> str:
         return self.title
+
+
+class MyAttachment(AbstractAttachment):
+    task = models.ForeignKey(
+        Task,
+        related_name='task',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    created = models.DateTimeField(
+        'Дата создания',
+        auto_now_add=True,
+        blank=True,
+        null=True,
+    )
 
 
 class UserTaskCaseRelation(CreatedModel):
