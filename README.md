@@ -4,8 +4,12 @@
 ![](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)
 
-
 Этот проект представляет собой web-приложение на Django Python, созданное для обучения и проверки знаний сотрудников по работе с авиабилетами, но может быть использовано и в других сферах.
+
+<img width="1189" alt="Вид сайта со стороны администратора" src="https://user-images.githubusercontent.com/103023542/224308479-b4b89822-4a21-42ac-bd22-23458f3988d2.png" caption="Вид сайта со стороны администратора">
+
+Вид сайта со стороны администратора
+
 
 > Проект развернут по адресу
 > ```sh
