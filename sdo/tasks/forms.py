@@ -53,7 +53,18 @@ class TaskFormTaskcase(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Добавление в данные формы related поле """
         super().__init__(*args, **kwargs)
+
+        # Если Блок-тест, то выбираем только вопросы-тесты, иначе наоборот
+        is_test = self.instance.is_test
+        if is_test:
+            self.fields['tasks'].queryset = Task.objects.filter(is_test=True)
+        else:
+            self.fields['tasks'].queryset = Task.objects.filter(is_test=False)
+
+        # Добавляет в форму уже выбранные вопросы
         self.fields['tasks'].initial = self.instance.tasks.all()
+        # self.fields['tasks'].initial = self.instance.tasks.all()
+
 
     def save(self, *args, **kwargs):
         """Сохранение данные в related поле """
@@ -121,20 +132,17 @@ class TestForm(forms.ModelForm):
 
 
 class CreateTaskForm(forms.ModelForm):
-    """Форма для ревью на ответы"""
-    def __init__(self, *args, **kwargs):
-        super(CreateTaskForm, self).__init__(*args, **kwargs)
-        self.fields['is_test'].disabled = True
+    """Форма для создания и редактирования вопроса"""
 
     description = forms.CharField(widget=SummernoteWidget, label='Описание')
 
     class Meta:
         model = Task
-        fields = ('title', 'description', 'answer', 'task_case', 'is_test')
+        fields = ('title', 'description', 'answer', 'task_case')
 
 
 class CreateTaskTestForm(forms.ModelForm):
-    """Форма для ревью на ответы"""
+    """Форма для создания и редактирования теста"""
 
     def __init__(self, *args, **kwargs):
         super(CreateTaskTestForm, self).__init__(*args, **kwargs)
@@ -143,10 +151,10 @@ class CreateTaskTestForm(forms.ModelForm):
 
     class Meta:
         model = Task
-        fields = ('title', 'description', 'answer', 'task_case', 'is_test')
-        # widgets = {
-        #     'text': forms.Textarea(attrs={'cols': 50, 'rows': 5})
-        # }
+        fields = ('title', 'description', 'task_case', 'is_test')
+        widgets = {
+            'description': forms.Textarea(attrs={'cols': 50, 'rows': 3})
+        }
 
     # def save(self, *args, **kwargs):
     #     instance = super().save(*args, **kwargs)

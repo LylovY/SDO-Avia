@@ -25,7 +25,8 @@ class CreatedTaskModel(CreatedModel):
     description = models.TextField(
         'Описание',
         max_length=2000,
-        help_text='Описание'
+        help_text='Описание',
+        blank=True
     )
 
     class Meta:

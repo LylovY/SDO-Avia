@@ -10,7 +10,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='password')
 
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1').split(',')
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -132,3 +132,5 @@ SUMMERNOTE_CONFIG = {
     },
     'attachment_model': 'tasks.MyAttachment',
 }
+
+

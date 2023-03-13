@@ -91,6 +91,10 @@ class UserTaskCaseRelation(CreatedModel):
         'Выполнение',
         default=False
     )
+    review = models.BooleanField(
+        'Для проверки',
+        default=False
+    )
 
 
 class UserTaskRelation(CreatedModel):

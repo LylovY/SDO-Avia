@@ -9,8 +9,9 @@ from tasks.views import AddTaskCaseUsers, AddTaskTaskCase, AnswerDetail, CreateT
     TaskCaseListAdminTest, TaskDetail, \
     TaskDetailAdmin, TaskListAdmin, \
     TaskListAdminCheck, TaskListAdminCheckTest, TaskListTestAdmin, TaskListUser, \
-    TestDetailAdmin, UpdateTask, UpdateTaskCase, UsersList, \
-    accept_answer, add_answer, add_review, add_variant, add_variants_to_user, complete_taskcase, delete_variant, \
+    TestDetailAdmin, UpdateTask, UpdateTaskCase, UpdateTest, UsersList, \
+    accept_answer, add_answer, add_review, add_variant, add_variants_to_user, complete_taskcase, \
+    complete_taskcase_admin, delete_variant, \
     update_variant
 from users.views import CreateUser, DeleteUser, TaskCaseUser, AddTaskUser, UpdateUser
 
@@ -47,12 +48,14 @@ urlpatterns = [
     path('tasks/tests/<int:pk>/add_variant', add_variant, name='add_variant'),
     path('tasks/tests/<int:pk>/<int:id_variant>/update_variant', update_variant, name='update_variant'),
     path('tasks/tests/<int:pk>/<int:id_variant>/delete_variant', delete_variant, name='delete_variant'),
-    path('tasks/<int:pk>/update/', UpdateTask.as_view(), name='update_task'),
+    path('tasks/<int:pk>/update_task/', UpdateTask.as_view(), name='update_task'),
+    path('tasks/<int:pk>/update_test/', UpdateTest.as_view(), name='update_test'),
     path('tasks/<int:pk>/delete', DeleteTask.as_view(), name='delete_task'),
     path('tasks_case/', TaskCaseListAdmin.as_view(), name='taskcase_list_admin'),
     path('tasks_case/<slug:username>/test', TaskCaseListAdminTest.as_view(), name='taskcase_list_admin_test'),
     path('tasks_case/create', CreateTaskCase.as_view(), name='create_taskcase'),
     path('tasks_case/<int:pk>/complete', complete_taskcase, name='complete_taskcase'),
+    path('tasks_case/<int:pk>/complete/<slug:username>/test', complete_taskcase_admin, name='complete_taskcase_admin'),
     path('tasks_case/<int:pk>/update', UpdateTaskCase.as_view(), name='update_taskcase'),
     path('tasks_case/<int:pk>/delete', DeleteTaskCase.as_view(), name='delete_taskcase'),
     path('tasks_case/<int:pk>/add_task_taskcase', AddTaskTaskCase.as_view(), name='add_task_taskcase'),

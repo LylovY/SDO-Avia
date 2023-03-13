@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -11,7 +12,7 @@ from core.views import AdminRequiredMixin, MyLoginRequiredMixin
 from tasks.forms import AnswerForm, CreateTaskForm, CreateTaskTestForm, ReviewForm, TaskFormTaskcase, \
     TaskFormTaskcaseUser, TestForm, \
     VariantForm
-from tasks.models import Answer, Task, TaskCase, UserTaskRelation, Variant
+from tasks.models import Answer, Task, TaskCase, UserTaskCaseRelation, UserTaskRelation, Variant
 from users.models import User
 
 
@@ -158,7 +159,7 @@ class TaskListAdmin(AdminRequiredMixin, ListView):
         search_term = self.request.GET.get('q')
         if search_term:
             return Task.objects.prefetch_related('task_case', 'users').filter(is_test=False,
-                                                                              title__icontains=search_term)
+                                                                              title__iregex=search_term)
         return Task.objects.prefetch_related('task_case', 'users').filter(is_test=False)
 
 
@@ -174,7 +175,7 @@ class TaskListTestAdmin(AdminRequiredMixin, ListView):
         search_term = self.request.GET.get('q')
         if search_term:
             return Task.objects.prefetch_related('task_case', 'users').filter(is_test=True,
-                                                                              title__icontains=search_term)
+                                                                              title__iregex=search_term)
         return Task.objects.prefetch_related('task_case', 'users').filter(is_test=True)
 
 
@@ -279,7 +280,6 @@ class CreateTask(AdminRequiredMixin, CreateView):
 class UpdateTask(AdminRequiredMixin, UpdateView):
     """GenericView изменения вопроса"""
     model = Task
-    # fields = ('title', 'description', 'answer', 'task_case', 'is_test')
     template_name = 'tasks/create_task.html'
     extra_context = {'title': 'Изменить вопрос'}
     success_url = reverse_lazy('tasks:task_list_admin')
@@ -293,38 +293,25 @@ class UpdateTask(AdminRequiredMixin, UpdateView):
         context['is_edit'] = True
         return context
 
-    # def form_valid(self, form):
-    #     messages.success(self.request, "Вопрос изменен")
-    #     form.save()
-    # # #     # super().form_valid(form)
-    #     return HttpResponse('<script>history.go(-2)</script>')
-        # return super().form_valid(form)
-    # def get_success_url(self):
-    #     # res = self.request.META.get('HTTP_REFERER')
-    #     res = self.request.build_absolute_uri()
-    #     print(res)
-    #     # res1 = HttpResponse('<script>history.go(-2);</script>')
-    #     # print(res1)
-    #     # res = reverse('tasks:task_list_admin')
-    #     # print(self.request.GET)
-    #     # if 'page' in self.request.GET:
-    #     #     res += f"?page={self.request.GET['page']}"
-    #     #     # print(res)
-    #     return res
-
-    # def get_success_url(self):
-    #     return self.request.path
     def get_success_url(self):
-        # get the current page from the query parameters
-        # current_page = self.request.GET.get('page')
         current_page = self.request.POST.get('page') or self.kwargs.get('page')
         if current_page:
-            # redirect to the current page in pagination
             return f"{reverse_lazy('tasks:task_list_admin')}?page={current_page}"
         else:
-            # redirect to the default success URL
             return super().get_success_url()
 
+
+class UpdateTest(UpdateTask):
+    success_url = reverse_lazy('tasks:task_list_admin_test')
+    form_class = CreateTaskTestForm
+    template_name = 'tasks/tests/create_test.html'
+
+    def get_success_url(self):
+        current_page = self.request.POST.get('page') or self.kwargs.get('page')
+        if current_page:
+            return f"{reverse_lazy('tasks:task_list_admin_test')}?page={current_page}"
+        else:
+            return super().get_success_url()
 
 class DeleteTask(AdminRequiredMixin, DeleteView):
     """GenericView удаления вопроса"""
@@ -339,6 +326,11 @@ class DeleteTask(AdminRequiredMixin, DeleteView):
         messages.success(self.request, self.success_message)
         return super(DeleteTask, self).delete(request, *args, **kwargs)
 
+    def get_success_url(self):
+        if self.object.is_test:
+            return reverse_lazy('tasks:task_list_admin_test')
+        else:
+            return reverse_lazy('tasks:task_list_admin')
 
 @login_required
 def add_answer(request, pk, id):
@@ -424,14 +416,18 @@ class UsersList(AdminRequiredMixin, ListView):
         FOR_REVISION = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.FOR_REVISION))
         ON_CHECK = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK))
         ACCEPT = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT))
+        WRONG = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.WRONG))
+        REVIEW = Count('task_case_relation', filter=Q(task_case_relation__review=True))
         return User.objects.annotate(
             note_count=Subquery(note_count),
             NEW=NEW,
             FOR_REVISION=FOR_REVISION,
             ON_CHECK=ON_CHECK,
             ACCEPT=ACCEPT,
+            WRONG=WRONG,
+            REVIEW=REVIEW,
             tests=Exists(Task.objects.filter(users=OuterRef('pk'), is_test=True))
-        ).order_by('-ON_CHECK', '-NEW').prefetch_related('tasks', 'task_case')
+        ).order_by('-ON_CHECK', '-REVIEW', '-NEW').prefetch_related('tasks', 'task_case')
         # ).annonate(
         #     # NEW=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW)),
         #     ON_CHECK=Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK)),
@@ -481,12 +477,27 @@ class AddTaskCaseUsers(MyLoginRequiredMixin, UpdateView):
 def complete_taskcase(request, pk):
     """Завершить выполнение группы вопросов пользователем"""
     taskcase = get_object_or_404(TaskCase, id=pk)
-    user = request.user
+    user= request.user
+    # relation_case = get_object_or_404(UserTaskCaseRelation, user=user, taskcase=taskcase)
+    # relation_case.review = False
     for task in taskcase.tasks.all():
         user.tasks.remove(task)
     user.task_case.remove(taskcase)
+
     return redirect('tasks:taskcase_list')
 
+@login_required()
+def complete_taskcase_admin(request, pk, username):
+    """Завершить выполнение группы вопросов пользователем"""
+    taskcase = get_object_or_404(TaskCase, id=pk)
+    user = get_object_or_404(User, username=username)
+    # relation_case = get_object_or_404(UserTaskCaseRelation, user=user, taskcase=taskcase)
+    # relation_case.review = False
+    for task in taskcase.tasks.all():
+        user.tasks.remove(task)
+    user.task_case.remove(taskcase)
+
+    return redirect('tasks:users_list')
 
 class CreateTest(AdminRequiredMixin, CreateView):
     """GenericView создания теста"""
@@ -531,7 +542,7 @@ class TestDetailAdmin(AdminRequiredMixin, DetailView):
 
 @login_required
 def add_variant(request, pk):
-    """Юзер добавляет ответ на вопрос"""
+    """Админ добавляет ответ на вопрос"""
     task = get_object_or_404(Task, id=pk)
     form = VariantForm(request.POST or None)
     # user = request.user
@@ -580,6 +591,7 @@ def add_variants_to_user(request, pk, id):
         user=user,
         task=task,
     )
+    relation_case = get_object_or_404(UserTaskCaseRelation, user=user, task_case=taskcase)
     correct_variants = Variant.objects.filter(task=task, correct=True)
     user_variants = user.variants.filter(task=task)
     # for field in form:
@@ -599,6 +611,14 @@ def add_variants_to_user(request, pk, id):
         else:
             relation.status = UserTaskRelation.WRONG
         relation.save()
+        if UserTaskRelation.objects.filter(
+            user=user,
+            task__is_test=True,
+            status='NEW',
+            task__task_case=taskcase,
+        ).count() == 0:
+            relation_case.review = True
+            relation_case.save()
         context = {
             'task': task,
             'taskcase': taskcase.id,
@@ -619,7 +639,7 @@ def add_variants_to_user(request, pk, id):
 
 
 class TaskCaseListAdminTest(AdminRequiredMixin, ListView):
-    """GenericView листа группы вопросов от юзера"""
+    """Просмотр админов блока тестов проходящих юзером"""
     paginate_by = 3
     model = TaskCase
     template_name = 'tasks/tests/test_case_list_admin.html'
