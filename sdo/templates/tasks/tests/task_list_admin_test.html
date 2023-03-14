@@ -43,7 +43,7 @@
 			</div>
 		</div>
 		<div align="justify"  class="collapse" id="collapse{{ task.id }}">
-			{{ task.description|linebreaks }}
+			<span>{{ task.description|safe|linebreaks }}</span>
 			<div class="h5 pt-3 pb-2">
 			 	Варианты:
 			</div>

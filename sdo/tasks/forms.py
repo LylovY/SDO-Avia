@@ -134,27 +134,41 @@ class TestForm(forms.ModelForm):
 class CreateTaskForm(forms.ModelForm):
     """Форма для создания и редактирования вопроса"""
 
-    description = forms.CharField(widget=SummernoteWidget, label='Описание')
+    def __init__(self, *args, **kwargs):
+        super(CreateTaskForm, self).__init__(*args, **kwargs)
+
+        # task_case фильтруем только по is_test=false
+        self.fields['task_case'].queryset = TaskCase.objects.filter(is_test=False)
+
+    description = forms.CharField(widget=SummernoteWidget, label='Вопрос')
 
     class Meta:
         model = Task
         fields = ('title', 'description', 'answer', 'task_case')
+        widgets = {
+            'answer': forms.Textarea(attrs={'cols': 50, 'rows': 3})
+        }
 
 
 class CreateTaskTestForm(forms.ModelForm):
     """Форма для создания и редактирования теста"""
+
+    description = forms.CharField(widget=SummernoteWidget, label='Описание теста')
 
     def __init__(self, *args, **kwargs):
         super(CreateTaskTestForm, self).__init__(*args, **kwargs)
         self.fields['is_test'].disabled = True
         self.fields['is_test'].initial = True
 
+        # task_case фильтруем только по is_test=true
+        self.fields['task_case'].queryset = TaskCase.objects.filter(is_test=True)
+
     class Meta:
         model = Task
         fields = ('title', 'description', 'task_case', 'is_test')
-        widgets = {
-            'description': forms.Textarea(attrs={'cols': 50, 'rows': 3})
-        }
+        # widgets = {
+        #     'description': forms.Textarea(attrs={'cols': 50, 'rows': 3})
+        # }
 
     # def save(self, *args, **kwargs):
     #     instance = super().save(*args, **kwargs)

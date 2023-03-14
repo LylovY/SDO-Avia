@@ -17,7 +17,7 @@
 			</div>
 		</div>
 		<div align="justify">
-			<p>{{ test.description|linebreaks }}</p>
+			<p>{{ test.description|safe|linebreaks }}</p>
 		</div>
 		{% for variant in test.variants.all %}
 			<div class="card mt-3 p-2 position-relative">

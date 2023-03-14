@@ -36,7 +36,7 @@
 			</div>
 		</div>
 		<div align="justify">
-			<p>{{ task.description|linebreaks }}</p>
+			<p>{{ task.description|safe|linebreaks }}</p>
 		</div>
 		{% if relation.status == 'NEW' %}
 			<div>

@@ -48,7 +48,7 @@
 		</div>
 		<div align="justify">
 			<pre>
-				<p>{{ task.description|linebreaks }}</p>
+				<p>{{ task.description|safe|linebreaks }}</p>
 			</pre>
 		</div>
 		{% if task.variants.count > 0 %}

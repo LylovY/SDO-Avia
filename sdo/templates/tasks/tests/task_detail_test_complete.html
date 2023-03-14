@@ -34,7 +34,7 @@
 			</div>
 		</div>
 		<div align="justify">
-			<p>{{ task.description|linebreaks }}</p>
+			<p>{{ task.description|safe|linebreaks }}</p>
 		</div>
 
 		<div class="d-flex justify-content-between mb-5">
