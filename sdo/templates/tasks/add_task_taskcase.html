@@ -19,7 +19,7 @@
       <form method="post" action="{% url 'tasks:add_task_taskcase' taskcase.id %}">
         {% csrf_token %}
         {% if form.tasks|length > 1 %}
-          <label for="select-all">
+          <label for="select-all" class="custom_select_all">
             <input type="checkbox" id="select-all"> Выбрать все
           </label>
           <hr>
