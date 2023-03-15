@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Count, Exists, F, Func, OuterRef, Q, Subquery
+from django.db.models import Case, CharField, Count, Exists, F, Func, OuterRef, Q, Subquery, Value, When
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -134,12 +134,23 @@ class TaskListUser(MyLoginRequiredMixin, ListView):
     extra_context = {'title': 'Список вопросов'}
 
     def get_queryset(self):
+        # определяем условия для оператора Case
+        cases = [
+            When(status='NEW', then=Value(1)),
+            When(status='REVISION', then=Value(2)),
+            When(status='CHECK', then=Value(3)),
+            When(status='ACCEPT', then=Value(4)),
+        ]
+        # задаем порядок сортировки, сначала по полю Case, затем по полю created
+        order_by = Case(*cases, output_field=CharField())
+        order_by += '-created'
+
         return Task.objects.filter(task_case=self.kwargs['pk']).annotate(
             status=Subquery(UserTaskRelation.objects.filter(
                 user=self.request.user,
                 task=OuterRef('pk'),
             ).order_by('-created').values('status')[:1]),
-        )
+        ).order_by(order_by)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -204,7 +215,7 @@ class TaskListAdminCheck(AdminRequiredMixin, ListView):
         return Task.objects.filter(
             Q(task_relation__status=UserTaskRelation.ON_CHECK) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
             users__username=self.kwargs.get('username'),
-        )
+        ).order_by('task_relation__status')
 
 
 class TaskListAdminCheckTest(AdminRequiredMixin, ListView):

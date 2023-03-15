@@ -18,6 +18,12 @@
     <div class="card-body">
       <form method="post" action="{% url 'tasks:add_task_taskcase' taskcase.id %}">
         {% csrf_token %}
+        {% if form.tasks|length > 1 %}
+          <label for="select-all">
+            <input type="checkbox" id="select-all"> Выбрать все
+          </label>
+          <hr>
+        {% endif %}
         {{ form.tasks|addclass:'p-0 m-0 list-unstyled' }}
         <button class="btn sendbutton mt-4" style="font-size: 100%;" type="submit">
           Применить
