@@ -4,20 +4,21 @@
 {% block content %}
 
 <div class="container p-0">
-	<a class="nlink rounded p-3" onclick="goBack()">
+	<a class="nlink rounded p-3" href="{% url 'tasks:task_list_admin_test' %}">
 		<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
 			<path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
 		</svg>
 		Назад</a>
 <!--	<button onclick="goBack()">Back</button>-->
+<!--	<a class="nlink rounded p-3" onclick="goBack()">-->
 	<article class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		<div class="h4 pt-5 d-flex justify-content-between">
 			<div class="row">
 				{{ test.title }}
 			</div>
 		</div>
-		<div align="justify">
-			<p>{{ test.description|safe|linebreaks }}</p>
+		<div align="justify" class="mt-3">
+			<p>{{ test.description|safe }}</p>
 		</div>
 		{% for variant in test.variants.all %}
 			<div class="card mt-3 p-2 position-relative">
