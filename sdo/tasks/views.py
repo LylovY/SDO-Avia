@@ -686,7 +686,8 @@ class TaskCaseListAdminTest(AdminRequiredMixin, ListView):
         context['title'] = 'СДО авиа'
         context['user'] = user
         return context
-# class TestDetail(MyLoginRequiredMixin, UpdateView):
+# class TestDetail(
+# MyLoginRequiredMixin, UpdateView):
 #     """GenericView одного вопроса от пользователя"""
 #     model = Task
 #     template_name = 'tasks/task_detail.html'
