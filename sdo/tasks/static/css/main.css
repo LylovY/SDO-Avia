@@ -29,7 +29,7 @@ html, main{
 	 -webkit-transform: scale(1.03);
 	 -moz-transform: scale(1.03);
 	 -o-transform: scale(1.03);
- transform: scale(1.03);
+ transform: scale(1.01);
 	 -webkit-transition: all 0.3s ease;
 	 -moz-transition: all 0.3s ease;
 	 transition: all 0.3s ease;
