@@ -140,6 +140,7 @@ class TaskListUser(MyLoginRequiredMixin, ListView):
             When(status='REVISION', then=Value(2)),
             When(status='CHECK', then=Value(3)),
             When(status='ACCEPT', then=Value(4)),
+            When(status='WRONG', then=Value(5)),
         ]
         # задаем порядок сортировки, сначала по полю Case, затем по полю created
         order_by = Case(*cases, output_field=CharField())
