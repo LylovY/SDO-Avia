@@ -32,11 +32,16 @@
 		<div align="justify">
 			<p>{{ task_case.description }}</p>
 		</div>
-		<div class="d-flex">
-			<div class="qlink" style="font-weight:700;" data-bs-toggle="collapse" href="#collapse{{ task_case.id }}" role="button" aria-expanded="false" aria-controls="collapse{{ task_case.id }}">
+		<div class="qlink d-flex" id="task-case-{{ task_case.id }}" onclick="changeImage('task-case-{{ task_case.id }}')" style="font-weight:700;" data-bs-toggle="collapse" href="#collapse{{ task_case.id }}" role="button" aria-expanded="false" aria-controls="collapse{{ task_case.id }}">
+			<div>
 				Вопросы ({{ task_case.tasks.count }})
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+			</div>
+			<div class="d-flex align-self-center ms-1">
+				<svg id="img2" class="bi bi-chevron-down disp" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
 					<path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+				</svg>
+				<svg id="img1" class="bi bi-chevron-up hidd" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+					<path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
 				</svg>
 			</div>
 		</div>
@@ -88,4 +93,29 @@
 	</div>
 	{% endfor %}
 </div>
+<script>
+function changeImage(taskCaseId) {
+	const img1 = document.querySelector(`[id=${CSS.escape(taskCaseId)}]`).querySelector('#img1');
+	const img2 = document.querySelector(`[id=${CSS.escape(taskCaseId)}]`).querySelector('#img2');
+	const hidden = 'hidd';
+	const display = 'disp';
+	if (img1.classList.contains('hidd')) {
+		// img1 is hidden
+		// displaying
+		img1.classList.add(display);
+		img1.classList.remove(hidden);
+		// hiding
+		img2.classList.add(hidden);
+		img2.classList.remove(display);
+	} else {
+		// img2 is hidden
+		// displaying
+		img2.classList.add(display);
+		img2.classList.remove(hidden);
+		// hiding
+		img1.classList.add(hidden);
+		img1.classList.remove(display);
+	}
+}
+</script>
 {% endblock %}

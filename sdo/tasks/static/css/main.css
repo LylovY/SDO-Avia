@@ -156,3 +156,11 @@ html, main{
 pre {
     white-space: pre-wrap;
 }
+
+.hidd {
+  display: none;
+}
+
+.disp {
+  display: block;
+}
