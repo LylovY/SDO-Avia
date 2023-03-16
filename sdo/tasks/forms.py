@@ -5,7 +5,7 @@ from django.utils.html import format_html
 from django import urls
 from django_summernote.widgets import SummernoteWidget
 
-from tasks.models import Answer, Review, Task, TaskCase, Variant
+from tasks.models import Answer, Review, Task, TaskCase, UserTaskRelation, Variant
 from users.models import User
 
 
@@ -91,9 +91,22 @@ class TaskFormTaskcaseUser(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['users'].initial = self.instance.users.all()
 
+    # def save(self, *args, **kwargs):
+    #     instance = super().save(*args, **kwargs)
+    #     instance.users.set(self.cleaned_data['users'])
+    #     return instance
     def save(self, *args, **kwargs):
         instance = super().save(*args, **kwargs)
-        instance.users.set(self.cleaned_data['users'])
+        selected_users = self.cleaned_data['users']
+        current_users = instance.users.all()
+
+        # Remove UserTaskRelation for users not selected in the form
+        for user in current_users:
+            if user not in selected_users:
+                relations = UserTaskRelation.objects.filter(user=user, task__in=instance.tasks.all())
+                relations.delete()
+
+        instance.users.set(selected_users)
         return instance
 
 

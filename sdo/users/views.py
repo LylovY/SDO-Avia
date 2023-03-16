@@ -79,20 +79,21 @@ class TaskCaseUser(UpdateView, AdminRequiredMixin, ):
     extra_context = {'title': 'Добавить блок вопросов пользователю'}
 
     def form_valid(self, form):
-        self.object.tasks.clear()
-        self.object.task_relation.all().delete()
-        self.object.variants.clear()
+        # self.object.tasks.clear()
+        # self.object.task_relation.all().delete()
+        # self.object.variants.clear()
         taskcases = [taskcase for taskcase in form.cleaned_data['task_case']]
 
         for taskcase in taskcases:
             for task in taskcase.tasks.all():
-                self.object.tasks.add(task)
-                # relation = UserTaskRelation.objects.create(
-                #     user=self.object,
-                #     task=task
-                # )
-                # relation.status = UserTaskRelation.NEW
-                # relation.save()
+                # self.object.tasks.add(task)
+                relation, create = UserTaskRelation.objects.get_or_create(
+                    user=self.object,
+                    task=task
+                )
+                if create:
+                    relation.status = UserTaskRelation.NEW
+                    relation.save()
         # taskcase.tasks.filter(task_relation__user=self.object).status = UserTaskRelation.NEW
         # self.object.tasks.set(taskcase.tasks.all())
         # for task in taskcase.tasks.all():
