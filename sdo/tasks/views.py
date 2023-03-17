@@ -25,7 +25,13 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
 
     def get_queryset(self):
         task_count_new = Task.objects.filter(
-            Q(task_relation__status=UserTaskRelation.NEW) | Q(task_relation__status=UserTaskRelation.FOR_REVISION),
+            Q(task_relation__status=UserTaskRelation.NEW),
+            task_case=OuterRef('id'),
+            task_relation__user=self.request.user).annotate(
+            count=Func(F('id'), function='Count')
+        ).values('count')
+        task_count_review = Task.objects.filter(
+            Q(task_relation__status=UserTaskRelation.FOR_REVISION),
             task_case=OuterRef('id'),
             task_relation__user=self.request.user).annotate(
             count=Func(F('id'), function='Count')
@@ -46,7 +52,8 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
             count=Func(F('id'), function='Count')
         ).values('count')
         return TaskCase.objects.filter(task_case_relation__user=self.request.user).annotate(
-            WAITING_ANSWER=Subquery(task_count_new),
+            NEW=Subquery(task_count_new),
+            REVIEW=Subquery(task_count_review),
             ON_CHECK=Subquery(task_count_oncheck),
             ACCEPT=Subquery(task_count_accept),
             WRONG=Subquery(task_count_wrong),
