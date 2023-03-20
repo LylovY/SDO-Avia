@@ -35,10 +35,10 @@
 					</p>
 					<div class="d-flex justify-content-end pt-3">
 						{% if forloop.last %}
-						<a class="btn addbutton me-2" href="{% url 'tasks:accept_answer' user relation.id %}">
+						<a class="btn addbutton me-2" href="{% url 'users:accept_answer' user relation.id %}">
 							Принять
 						</a>
-						<a class="btn sendbutton" href="{% url 'tasks:answer_detail' user relation.id answer.id %}">
+						<a class="btn sendbutton" href="{% url 'users:answer_detail' user relation.id answer.id %}">
 							На доработку
 						</a>
 						{% endif %}

@@ -13,10 +13,9 @@ from users.models import User
 class CreateUser(CreateView, SuccessMessageMixin, AdminRequiredMixin, ):
     """Создание юзера"""
     model = User
-    # fields = ('username', 'first_name', 'password')
     form_class = CreationForm
     template_name = 'users/create_user.html'
-    success_url = reverse_lazy('tasks:users_list')
+    success_url = reverse_lazy('users:users_list')
     success_message = 'Аккаунт добавлен'
     extra_context = {'title': 'Создать аккаунт'}
 
@@ -27,14 +26,13 @@ class CreateUser(CreateView, SuccessMessageMixin, AdminRequiredMixin, ):
 
 
 class UpdateUser(UpdateView, AdminRequiredMixin):
-    """СИзменение юзера"""
+    """Изменение юзера"""
     model = User
-    # fields = ('username', 'first_name', 'password')
     form_class = CreationForm
     template_name = 'users/create_user.html'
     slug_field = 'username'
     slug_url_kwarg = 'username'
-    success_url = reverse_lazy('tasks:users_list')
+    success_url = reverse_lazy('users:users_list')
     extra_context = {'title': 'Изменить аккаунт'}
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -47,16 +45,13 @@ class UpdateUser(UpdateView, AdminRequiredMixin):
         super().form_valid(form)
         return HttpResponseRedirect(self.get_success_url())
 
-    # def get_object(self):
-    #     return User.objects.get(username=self.kwargs.get("username"))
-
 
 class DeleteUser(DeleteView, SuccessMessageMixin, AdminRequiredMixin):
     """Удаление юзера"""
     model = User
     slug_field = 'username'
     slug_url_kwarg = 'username'
-    success_url = reverse_lazy('tasks:users_list')
+    success_url = reverse_lazy('users:users_list')
     template_name = 'users/confirm_delete_user.html'
     context_object_name = 'user'
     success_message = 'Аккаунт удален'
@@ -75,7 +70,7 @@ class TaskCaseUser(UpdateView, AdminRequiredMixin, ):
     slug_url_kwarg = 'username'
     context_object_name = 'user'
     template_name = 'users/add_taskcase_user.html'
-    success_url = reverse_lazy('tasks:users_list')
+    success_url = reverse_lazy('users:users_list')
     extra_context = {'title': 'Добавить блок вопросов пользователю'}
 
     def form_valid(self, form):
@@ -110,5 +105,5 @@ class AddTaskUser(UpdateView, AdminRequiredMixin, ):
     slug_url_kwarg = 'username'
     context_object_name = 'user'
     template_name = 'users/add_task_user.html'
-    success_url = reverse_lazy('tasks:users_list')
+    success_url = reverse_lazy('users:users_list')
     extra_context = {'title': 'Добавить вопросы пользователю'}

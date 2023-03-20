@@ -6,8 +6,9 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tasks.urls', namespace='tasks')),
-    path('auth/', include('users.urls')),
+    path('auth/', include('users.urls', namespace='auth_users')),
     path('auth/', include('django.contrib.auth.urls')),
+    path('users/', include('users.urls', namespace='users')),
     # path('__debug__/', include('debug_toolbar.urls')),
     path('summernote/', include('django_summernote.urls')),
 ]

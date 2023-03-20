@@ -11,7 +11,7 @@
     </svg>
     Назад
   </a>
-	<form method="post" action="{% url 'tasks:add_task_user' user.username %}" class="shadow p-5 pt-0 mt-3 bg-body rounded">
+	<form method="post" action="{% url 'users:add_task_user' user.username %}" class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		{% csrf_token %}
 		{{ form.tasks|addclass:' p-0 m-0 list-unstyled ' }}
 		<button class="btn sendbutton mt-4" style="font-size: 100%;" type="submit">

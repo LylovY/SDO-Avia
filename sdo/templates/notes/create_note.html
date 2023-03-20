@@ -22,9 +22,9 @@
         {% load user_filters %}
         <form enctype="multipart/form-data" method="post"
         action="{% if is_edit %}
-                  {% url 'tasks:update_note' username note.id %}
+                  {% url 'users:update_note' username note.id %}
                 {% else %}
-                  {% url 'tasks:create_note' username %}
+                  {% url 'users:create_note' username %}
                 {% endif %}">
         {% csrf_token %}
         {% for field in form %}

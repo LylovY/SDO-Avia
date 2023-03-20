@@ -1,9 +1,7 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
 from django.db.models import Case, CharField, Count, Exists, F, Func, OuterRef, Q, Subquery, Value, When
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
@@ -47,8 +45,8 @@ class TaskCaseList(MyLoginRequiredMixin, ListView):
             count=Func(F('id'), function='Count')
         ).values('count')
         task_count_wrong = Task.objects.filter(task_case=OuterRef('id'),
-                                                task_relation__user=self.request.user,
-                                                task_relation__status=UserTaskRelation.WRONG).annotate(
+                                               task_relation__user=self.request.user,
+                                               task_relation__status=UserTaskRelation.WRONG).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
         return TaskCase.objects.filter(task_case_relation__user=self.request.user).annotate(
@@ -240,7 +238,8 @@ class TaskListAdminCheckTest(AdminRequiredMixin, ListView):
 
     def get_queryset(self):
         # user_variants = Subquery(Variant.objects.filter(task=OuterRef('pk'), users__username=self.kwargs.get('username')).values('text')[:1])
-        return Task.objects.filter(users__username=self.kwargs.get('username'), is_test=True, task_case=self.kwargs.get('pk')).annotate(
+        return Task.objects.filter(users__username=self.kwargs.get('username'), is_test=True,
+                                   task_case=self.kwargs.get('pk')).annotate(
             status=Subquery(UserTaskRelation.objects.filter(
                 user__username=self.kwargs.get('username'),
                 task=OuterRef('pk'),
@@ -256,6 +255,7 @@ class TaskDetail(MyLoginRequiredMixin, DetailView, UpdateView):
     pk_url_kwarg = 'id'
     extra_context = {'title': 'Вопросы'}
     form_class = TestForm
+
     # form_class = AnswerForm
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -283,7 +283,6 @@ class TaskDetail(MyLoginRequiredMixin, DetailView, UpdateView):
 class CreateTask(AdminRequiredMixin, CreateView):
     """GenericView создания вопроса"""
     model = Task
-    # fields = ('title', 'description', 'answer', 'task_case')
     template_name = 'tasks/create_task.html'
     success_url = reverse_lazy('tasks:task_list_admin')
     extra_context = {'title': 'Создать вопрос'}
@@ -303,8 +302,6 @@ class UpdateTask(AdminRequiredMixin, UpdateView):
     extra_context = {'title': 'Изменить вопрос'}
     success_url = reverse_lazy('tasks:task_list_admin')
     form_class = CreateTaskForm
-
-    # success_url = HttpResponseRedirect(self.request.path_info)
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -352,6 +349,7 @@ class DeleteTask(AdminRequiredMixin, DeleteView):
         else:
             return reverse_lazy('tasks:task_list_admin')
 
+
 @login_required
 def add_answer(request, pk, id):
     """Юзер добавляет ответ на вопрос"""
@@ -380,8 +378,8 @@ def accept_answer(request, username, pk):
     relation.save()
     user = get_object_or_404(User, username=username)
     if user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count() > 0:
-        return redirect('tasks:check_task', username)
-    return redirect('tasks:users_list')
+        return redirect('users:check_task', username)
+    return redirect('users:users_list')
 
 
 class AnswerDetail(MyLoginRequiredMixin, DetailView):
@@ -414,14 +412,14 @@ def add_review(request, username, pk, id):
         relation.save()
     user = get_object_or_404(User, username=username)
     if user.tasks.filter(task_relation__status=UserTaskRelation.ON_CHECK).count() > 0:
-        return redirect('tasks:check_task', username)
-    return redirect('tasks:users_list')
+        return redirect('users:check_task', username)
+    return redirect('users:users_list')
 
 
 class UsersList(AdminRequiredMixin, ListView):
     """GenericView листа юзеров"""
     model = User
-    template_name = 'tasks/users.html'
+    template_name = 'users/users.html'
     context_object_name = 'users'
     extra_context = {'title': 'Сотрудники'}
 
@@ -432,22 +430,22 @@ class UsersList(AdminRequiredMixin, ListView):
     def get_queryset(self):
         note_count = User.objects.annotate(count=Count('notes')).values('count').order_by('-date_joined').filter(
             pk=OuterRef('pk'))
-        NEW = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW), distinct=True)
-        FOR_REVISION = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.FOR_REVISION), distinct=True)
-        ON_CHECK = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK), distinct=True)
-        ACCEPT = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT), distinct=True)
-        WRONG = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.WRONG), distinct=True)
-        REVIEW = Count('task_case_relation', filter=Q(task_case_relation__review=True), distinct=True)
+        new = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.NEW), distinct=True)
+        for_revision = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.FOR_REVISION), distinct=True)
+        on_check = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ON_CHECK), distinct=True)
+        accept = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.ACCEPT), distinct=True)
+        wrong = Count('tasks', filter=Q(task_relation__status=UserTaskRelation.WRONG), distinct=True)
+        review = Count('task_case_relation', filter=Q(task_case_relation__review=True), distinct=True)
         return User.objects.annotate(
             note_count=Subquery(note_count),
-            NEW=NEW,
-            FOR_REVISION=FOR_REVISION,
-            ON_CHECK=ON_CHECK,
-            ACCEPT=ACCEPT,
-            WRONG=WRONG,
-            REVIEW=REVIEW,
+            new=new,
+            for_revision=for_revision,
+            on_check=on_check,
+            accept=accept,
+            wrong=wrong,
+            review=review,
             tests=Exists(Task.objects.filter(users=OuterRef('pk'), is_test=True))
-        ).order_by('-ON_CHECK', '-REVIEW', '-NEW').prefetch_related('tasks', 'task_case')
+        ).order_by('-on_check', '-review', '-new').prefetch_related('tasks', 'task_case')
 
 
 class AddTaskTaskCase(MyLoginRequiredMixin, UpdateView):
@@ -494,6 +492,7 @@ def complete_taskcase(request, pk):
     user.task_case.remove(taskcase)
 
     return redirect('tasks:taskcase_list')
+
 
 @login_required()
 def complete_taskcase_admin(request, pk, username):
@@ -556,6 +555,7 @@ def add_variant(request, pk):
         variant.save()
     return redirect('tasks:test_detail_admin', pk)
 
+
 @login_required
 def update_variant(request, pk, id_variant):
     variant = get_object_or_404(Variant, id=id_variant)
@@ -615,10 +615,10 @@ def add_variants_to_user(request, pk, id):
             relation.status = UserTaskRelation.WRONG
         relation.save()
         if UserTaskRelation.objects.filter(
-            user=user,
-            task__is_test=True,
-            status='NEW',
-            task__task_case=taskcase,
+                user=user,
+                task__is_test=True,
+                status='NEW',
+                task__task_case=taskcase,
         ).count() == 0:
             relation_case.review = True
             relation_case.save()
@@ -666,11 +666,12 @@ class TaskCaseListAdminTest(AdminRequiredMixin, ListView):
             count=Func(F('id'), function='Count')
         ).values('count')
         task_count_wrong = Task.objects.filter(task_case=OuterRef('id'),
-                                                task_relation__user__username=self.kwargs.get('username'),
-                                                task_relation__status=UserTaskRelation.WRONG).annotate(
+                                               task_relation__user__username=self.kwargs.get('username'),
+                                               task_relation__status=UserTaskRelation.WRONG).annotate(
             count=Func(F('id'), function='Count')
         ).values('count')
-        return TaskCase.objects.filter(task_case_relation__user__username=self.kwargs.get('username'), is_test=True).annotate(
+        return TaskCase.objects.filter(task_case_relation__user__username=self.kwargs.get('username'),
+                                       is_test=True).annotate(
             WAITING_ANSWER=Subquery(task_count_new),
             ON_CHECK=Subquery(task_count_oncheck),
             ACCEPT=Subquery(task_count_accept),

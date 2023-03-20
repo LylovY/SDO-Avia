@@ -47,7 +47,7 @@ class CreateNote(CreateView):
 
     def get_success_url(self):
         username = self.kwargs.get('username')
-        res = reverse_lazy('tasks:note_list', kwargs={'username': username})
+        res = reverse_lazy('users:note_list', kwargs={'username': username})
         return res
 
 
@@ -71,7 +71,7 @@ class UpdateNote(UpdateView):
 
     def get_success_url(self):
         username = self.kwargs.get('username')
-        res = reverse_lazy('tasks:note_list', kwargs={'username': username})
+        res = reverse_lazy('users:note_list', kwargs={'username': username})
         return res
 
 
@@ -83,7 +83,7 @@ class DeleteNote(DeleteView):
 
     def get_success_url(self):
         username = self.kwargs.get('username')
-        res = reverse_lazy('tasks:note_list', kwargs={'username': username})
+        res = reverse_lazy('users:note_list', kwargs={'username': username})
         return res
 
     def get_context_data(self, *, object_list=None, **kwargs):

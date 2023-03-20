@@ -26,9 +26,9 @@
           {% endfor %}
         {% endif %}
         <form method="post" action="{% if is_edit %}
-                                      {% url 'tasks:update_user' user %}
+                                      {% url 'users:update_user' user %}
                                     {% else %}
-                                      {% url 'tasks:create_user' %}
+                                      {% url 'users:create_user' %}
                                     {% endif %}" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}

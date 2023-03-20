@@ -7,7 +7,7 @@
     {% for case in task_case %}
     <div class="col">
       <div class="card shadow cardcustom">
-        <a href="{% url 'tasks:check_task_test' user case.pk %}" class="text-reset text-decoration-none">
+        <a href="{% url 'users:check_task_test' user case.pk %}" class="text-reset text-decoration-none">
           <div class="card-body">
             <h5 class="card-title">{{ case.title }}</h5>
             <p class="card-text">{{ case.description }}</p>

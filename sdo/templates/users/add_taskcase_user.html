@@ -11,7 +11,7 @@
     </svg>
     Назад
   </a>
-	<form method="post" action="{% url 'tasks:add_taskcase_user' user.username %}" class="shadow p-5 pt-0 mt-3 bg-body rounded">
+	<form method="post" action="{% url 'users:add_taskcase_user' user.username %}" class="shadow p-5 pt-0 mt-3 bg-body rounded">
 		{% csrf_token %}
     <div class="h4 pt-5">
       Назначить тест сотруднику {{ user.username }}({{ user.first_name }})
