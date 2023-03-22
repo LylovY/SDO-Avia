@@ -503,7 +503,7 @@ def complete_taskcase_admin(request, pk, username):
         user.tasks.remove(task)
     user.task_case.remove(taskcase)
 
-    return redirect('tasks:users_list')
+    return redirect('users:users_list')
 
 
 class CreateTest(AdminRequiredMixin, CreateView):

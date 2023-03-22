@@ -1,13 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.forms import models
 
 from tasks.models import Task, TaskCase, UserTaskRelation
 from users.models import User
 
 
+class CustomCountModelChoiceField(models.ModelMultipleChoiceField):
+    """Переобределенный лейбл формы ModelMultipleChoice с добавлением количества вопросов """
+    def label_from_instance(self, obj):
+        count = obj.tasks.count()
+        return f'{obj.title} ({count})'
+
+
 class TaskCaseForm(forms.ModelForm):
     """Форма добавления юзеру группы вопросов"""
-    task_case = forms.ModelMultipleChoiceField(
+    task_case = CustomCountModelChoiceField(
         queryset=TaskCase.objects.all(),
         label='Группы вопросов',
         help_text='Назначьте группы вопросов',

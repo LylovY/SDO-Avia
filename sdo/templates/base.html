@@ -46,11 +46,28 @@
       }
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--    <script>-->
+<!--      $(document).ready(function() {-->
+<!--        $('.custom_select_all input[type="checkbox"]').change(function() {-->
+<!--          $('input[type="checkbox"]').prop('checked', $(this).prop('checked'));-->
+<!--        });-->
+<!--      });-->
+<!--    </script>-->
     <script>
-      $(document).ready(function() {
-        $('.custom_select_all input[type="checkbox"]').change(function() {
-          $('input[type="checkbox"]').prop('checked', $(this).prop('checked'));
-        });
+    $(document).ready(function() {
+      const checkboxes = $('input[type="checkbox"]');
+      const selectAll = $('.custom_select_all input[type="checkbox"]');
+      selectAll.prop('checked', checkboxes.length === checkboxes.filter(':checked').length);
+      selectAll.change(function() {
+        checkboxes.prop('checked', $(this).prop('checked'));
+        selectAll.prop('checked', checkboxes.length === checkboxes.filter(':checked').length);
       });
+      checkboxes.change(function() {
+        selectAll.prop('checked', checkboxes.length === checkboxes.filter(':checked').length);
+      });
+    });
+
+
     </script>
+
   </body>
